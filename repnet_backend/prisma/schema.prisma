@@ -1,0 +1,135 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  // output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id Int @default(autoincrement()) @id
+  name String
+  fathersLastName String
+  mothersLastName String
+  username String @unique
+  email String @unique
+  hashedPassword String
+  hashedRefreshToken String?
+  // user status available: active, suspended, banned
+  userStatus String @default("active")
+  // user roles available: user, engineer, admin
+  userRole String @default("user")
+  votes Vote[]
+  reports Report[]
+
+  updatedAt DateTime? @default(now())
+  createdAt DateTime @default(now())
+}
+
+// Has reference to a User instance
+// Has reference to a Report instnace
+model Vote {
+  id Int @default(autoincrement()) @id
+  // vote types: downvote and upvote
+  voteType String
+
+  user User @relation(fields: [userId], references: [id])
+  userId Int
+  report Report @relation(fields: [reportId], references: [id])
+  reportId Int
+
+  updatedAt DateTime? @default(now())
+  createdAt DateTime @default(now())
+}
+
+// Has a reference to a Report instance
+model Evidence {
+  id Int @default(autoincrement()) @id
+  evidenceType String?
+  evidenceFileUrl String?
+
+  report Report @relation(fields: [reportId], references: [id])
+  reportId Int
+
+  updatedAt DateTime? @default(now())
+  createdAt DateTime @default(now())
+}
+
+model Site {
+  id Int @default(autoincrement()) @id
+  siteDomain String?
+  siteReputation Int @default(0)
+  reports Report[]
+
+  updatedAt DateTime?
+  createdAt DateTime @default(now())
+}
+
+model Tag {
+  id Int @default(autoincrement()) @id
+  tagName String
+  reports ReportTags[]
+
+  updatedAt DateTime? @default(now())
+  createdAt DateTime @default(now())
+}
+
+model ReportTags {
+  tag Tag @relation(fields: [tagId], references: [id])
+  tagId Int
+  report Report @relation(fields: [reportId], references: [id])
+  reportId Int
+
+  @@id([tagId, reportId])
+}
+
+// Has a reference to Site instance
+// Has a reference to User instance
+model Report {
+  id Int @default(autoincrement()) @id
+  reportTitle String
+  reportUrl String?
+  reportDescription String
+  // report status available: approved, pending, rejected
+  reportStatus String @default("pending")
+  severity Int @default(0)
+  votes Vote[]
+  evidences Evidence[]
+  tags ReportTags[]
+  impacts ReportImpacts[]
+
+  site Site @relation(fields: [siteId], references: [id])
+  siteId Int
+  user User @relation(fields: [userId], references: [id])
+  userId Int
+
+  updatedAt DateTime? @default(now())
+  createdAt DateTime @default(now())
+}
+
+model ReportImpacts {
+  report Report @relation(fields: [reportId], references: [id])
+  reportId Int
+  impact Impact @relation(fields: [impactId], references: [id])
+  impactId Int
+
+  @@id([reportId, impactId])
+}
+
+model Impact {
+  id Int @default(autoincrement()) @id
+  impactName String
+  impactDescription String
+  reports ReportImpacts[]
+
+  updatedAt DateTime? @default(now())
+  createdAt DateTime @default(now())
+}

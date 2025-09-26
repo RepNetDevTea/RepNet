@@ -1,1 +1,5 @@
+# ignored files from backend
+
 /repnet_backend/node_modules
+/repnet_backend/.env
+/repnet_backend/generated/prisma
