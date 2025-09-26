@@ -10,7 +10,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
@@ -30,7 +30,7 @@ model User {
   votes Vote[]
   reports Report[]
 
-  updatedAt DateTime? @default(now())
+  updatedAt DateTime @default(now())
   createdAt DateTime @default(now())
 }
 
@@ -46,20 +46,20 @@ model Vote {
   report Report @relation(fields: [reportId], references: [id])
   reportId Int
 
-  updatedAt DateTime? @default(now())
+  updatedAt DateTime @default(now())
   createdAt DateTime @default(now())
 }
 
 // Has a reference to a Report instance
 model Evidence {
   id Int @default(autoincrement()) @id
-  evidenceType String?
-  evidenceFileUrl String?
+  evidenceType String
+  evidenceFileUrl String
 
   report Report @relation(fields: [reportId], references: [id])
   reportId Int
 
-  updatedAt DateTime? @default(now())
+  updatedAt DateTime @default(now())
   createdAt DateTime @default(now())
 }
 
@@ -69,7 +69,7 @@ model Site {
   siteReputation Int @default(0)
   reports Report[]
 
-  updatedAt DateTime?
+  updatedAt DateTime
   createdAt DateTime @default(now())
 }
 
@@ -78,7 +78,7 @@ model Tag {
   tagName String
   reports ReportTags[]
 
-  updatedAt DateTime? @default(now())
+  updatedAt DateTime @default(now())
   createdAt DateTime @default(now())
 }
 
@@ -111,7 +111,7 @@ model Report {
   user User @relation(fields: [userId], references: [id])
   userId Int
 
-  updatedAt DateTime? @default(now())
+  updatedAt DateTime @default(now())
   createdAt DateTime @default(now())
 }
 
@@ -130,6 +130,6 @@ model Impact {
   impactDescription String
   reports ReportImpacts[]
 
-  updatedAt DateTime? @default(now())
+  updatedAt DateTime @default(now())
   createdAt DateTime @default(now())
 }
