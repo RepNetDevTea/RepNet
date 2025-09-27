@@ -76,6 +76,7 @@ model Site {
 model Tag {
   id Int @default(autoincrement()) @id
   tagName String
+  tagScore Int
   reports ReportTags[]
 
   updatedAt DateTime @default(now())
@@ -127,6 +128,7 @@ model ReportImpacts {
 model Impact {
   id Int @default(autoincrement()) @id
   impactName String
+  impactScore Int
   impactDescription String
   reports ReportImpacts[]
 
