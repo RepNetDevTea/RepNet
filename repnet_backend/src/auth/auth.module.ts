@@ -9,12 +9,14 @@ import { ConfigModule } from '@nestjs/config';
 import { PassportModule } from '@nestjs/passport';
 import refreshJwtConfig from './config/refresh-jwt.config';
 import { AccessJwtAuthStrategy } from './strategies/access-jwt.strategy';
+import { RefreshJwtAuthStrategy } from './strategies/refresh-jwt.strategy';
 
 @Module({
   providers: [
     AuthService, 
     LocalStrategy, 
     AccessJwtAuthStrategy, 
+    RefreshJwtAuthStrategy, 
   ], 
   controllers: [AuthController], 
   imports: [

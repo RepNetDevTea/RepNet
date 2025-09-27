@@ -11,7 +11,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  validate(email: string, password: string) {
-    return this.authService.findByCredentials(email, password);
+  async validate(email: string, password: string) {
+    return await this.authService.findByCredentials({ email, password });
   }
 }

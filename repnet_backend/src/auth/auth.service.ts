@@ -26,15 +26,14 @@ export class AuthService {
     return { userId, accessToken, refreshToken };
   }
 
-  async findByCredentials(email: string, password: string) {
+  async findByCredentials({ email, password }) {
     const user = await this.prisma.user.findUnique({ where: { email } });
     if (!user)
       throw new NotFoundException('Invalid credentials');
 
-    const [salt, storedHash] = user.hashedPassword;
-    const hashedPassword = await scrypt(salt, password, 32) as Buffer;
-
-    if (storedHash !== hashedPassword.toString('hex'))
+    const [salt, storedHash] = user.hashedPassword.split('.');
+    const notStoredHash = await scrypt(password, salt, 32) as Buffer;
+    if (storedHash !== notStoredHash.toString('hex'))
       throw new HttpException('Invalid credentials', 400);
 
     return user;

@@ -3,3 +3,4 @@
 /repnet_backend/node_modules
 /repnet_backend/.env
 /repnet_backend/generated/prisma
+/repnet_backend/dist

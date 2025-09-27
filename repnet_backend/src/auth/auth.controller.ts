@@ -4,7 +4,7 @@ import type { Request } from 'express';
 import { classToPlain } from 'class-transformer';
 import { AuthService } from './auth.service';
 import { AccessJwtAuthGuard } from './guards/access-jwt-auth.guard';
-import { RefreshJwtAuthGuard } from './strategies/refresh-jwt.strategy';
+import { RefreshJwtAuthGuard } from './guards/refresh-jwt-auth.guard';
 
 @Controller('auth')
 export class AuthController {
