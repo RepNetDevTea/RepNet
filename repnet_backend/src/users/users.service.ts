@@ -15,11 +15,19 @@ export class UsersService {
     private authService: AuthService, 
   ) {}
   
-  async createUser(data: Prisma.UserCreateInput) {
-    const password = data.hashedPassword;
+  async hashPassword(password: string) {
     const salt = randomBytes(8).toString('hex');
     const hashedPassword = await scrypt(password, salt, 32) as Buffer;
-    data.hashedPassword = salt + '.' + hashedPassword.toString('hex');
+    const hashToStore = salt + '.' + hashedPassword.toString('hex');
+    return hashToStore;
+  }
+
+  async findUserById(userId: number) {
+    return await this.prisma.user.findUnique({ where: { id: userId } });
+  } 
+  
+  async createUser(data: Prisma.UserCreateInput) {
+    data.hashedPassword = await this.hashPassword(data.hashedPassword);
 
     const newUser = await this.prisma.user.create({ data });   
     
@@ -34,5 +42,31 @@ export class UsersService {
     });
 
     return { newUser, accessToken, refreshToken };
+  }
+
+  async updateUser(userId: number, data: Prisma.UserUpdateInput) {
+    const user = await this.findUserById(userId);
+    if (!user)
+      return null;
+
+    if ('hashedPassword' in data)
+      data.hashedPassword = await this.hashPassword(data.hashedPassword as string);
+
+    const updatedAt = new Date().toISOString();
+    return await this.prisma.user.update({ 
+      where: { id: user.id }, 
+      data: {
+        ...data,
+        updatedAt, 
+      } 
+    });
+  }
+
+  async deleteUser(userId: number) {
+    const user = await this.findUserById(userId);
+    if (!user)
+      return null;
+
+    return await this.prisma.user.delete({ where: { id: user.id } });
   }
 }
