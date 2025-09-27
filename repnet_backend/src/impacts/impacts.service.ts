@@ -23,7 +23,14 @@ export class ImpactsService {
     if (!impact)
       return null;
 
-    return await this.prisma.impact.update({ where: { id: impact.id }, data });
+    const updatedAt = new Date().toISOString()
+    return await this.prisma.impact.update({ 
+      where: { id: impact.id }, 
+      data: {
+        ...data, 
+        updatedAt, 
+      }
+    });
   }
   
   async deleteImpact(impactId: number) {

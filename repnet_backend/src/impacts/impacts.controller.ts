@@ -4,7 +4,7 @@ import { ImpactsService } from './impacts.service';
 import { UpdateImpactDto } from './dtos/update-impact.dto';
 
 
-@Controller('impact')
+@Controller('impacts')
 export class ImpactsController {
   constructor(private impactsService: ImpactsService) {}
   

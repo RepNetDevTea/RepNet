@@ -23,7 +23,14 @@ export class TagsService {
     if (!tag)
       return null;
 
-    return await this.prisma.tag.update({ where: { id: tag.id }, data });
+    const updatedAt = new Date().toISOString()
+    return await this.prisma.tag.update({ 
+      where: { id: tag.id }, 
+      data: {
+        ...data, 
+        updatedAt, 
+      }
+    });
   }
   
   async deleteTag(tagId: number) {

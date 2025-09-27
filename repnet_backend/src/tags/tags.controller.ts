@@ -3,7 +3,7 @@ import { CreateTagDto } from './dtos/create-tag.dto';
 import { TagsService } from './tags.service';
 import { UpdateTagDto } from './dtos/update-tag.dto';
 
-@Controller('tag')
+@Controller('tags')
 export class TagsController {
   constructor(private tagsService: TagsService) {}
   
