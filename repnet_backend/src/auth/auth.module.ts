@@ -8,11 +8,13 @@ import accessJwtConfig from './config/access-jwt.config';
 import { ConfigModule } from '@nestjs/config';
 import { PassportModule } from '@nestjs/passport';
 import refreshJwtConfig from './config/refresh-jwt.config';
+import { AccessJwtAuthStrategy } from './strategies/access-jwt.strategy';
 
 @Module({
   providers: [
     AuthService, 
     LocalStrategy, 
+    AccessJwtAuthStrategy, 
   ], 
   controllers: [AuthController], 
   imports: [
