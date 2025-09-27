@@ -56,10 +56,12 @@ export class AuthService {
     if (!user)
       throw new NotFoundException('No user found');
 
-    return await this.prisma.user.update({
+    await this.prisma.user.update({
       where: { id: user.id }, 
       data: { hashedRefreshToken } 
     });
+
+    return user;
   }
 
   async refreshTokens(userId: number, payload: object) {

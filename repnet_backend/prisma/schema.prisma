@@ -22,7 +22,7 @@ model User {
   username String @unique
   email String @unique
   hashedPassword String
-  hashedRefreshToken String?
+  hashedRefreshToken String? @db.VarChar(512)
   // user status available: active, suspended, banned
   userStatus String @default("active")
   // user roles available: user, engineer, admin

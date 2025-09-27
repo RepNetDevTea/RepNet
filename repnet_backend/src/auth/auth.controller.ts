@@ -18,6 +18,7 @@ export class AuthController {
     const { id, email, username, role } = user;
     const payload = { id, username, email, role };
     const { accessToken, refreshToken } = await this.authService.generateTokens(id, payload);
+    await this.authService.updateHashedRefreshToken(id, refreshToken);
     
     return { user, accessToken, refreshToken };
   }
