@@ -1,4 +1,8 @@
-import { Body, Controller, FileTypeValidator, Inject, MaxFileSizeValidator, Param, ParseFilePipe, ParseIntPipe, Post, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { 
+  Body, Controller, FileTypeValidator, Inject, MaxFileSizeValidator, Param, 
+  ParseFilePipe, ParseIntPipe, Post, Req, UploadedFile, UseGuards, 
+  UseInterceptors 
+} from '@nestjs/common';
 import { ReportsService } from './reports.service';
 import { AccessJwtAuthGuard } from 'src/auth/guards/access-jwt-auth.guard';
 import type { Request } from 'express';

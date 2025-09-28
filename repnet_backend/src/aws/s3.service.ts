@@ -5,7 +5,7 @@ import type { ConfigType } from '@nestjs/config';
 
 @Injectable()
 export class S3Service {
-  // Tenemos que instanciar a la clase S3Cliente para poder interactuar con nuestro 
+  // Tenemos que instanciar a la clase S3Client para poder interactuar con nuestro 
   // S3 Bucket de AWS, pero antes de poder usarlo, tenemos que pasar un objeto 
   // configure a nuestro S3Client
   private s3Client: S3Client;
