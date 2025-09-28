@@ -55,6 +55,7 @@ model Evidence {
   id Int @default(autoincrement()) @id
   evidenceType String
   evidenceFileUrl String
+  evidenceKey String
 
   report Report @relation(fields: [reportId], references: [id])
   reportId Int

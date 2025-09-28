@@ -29,6 +29,9 @@ import { APP_GUARD } from '@nestjs/core';
       limit: 2, 
     }]), 
   ],
-  exports: [S3Service], 
+  exports: [
+    S3Service,
+    ConfigModule.forFeature(s3Config), 
+  ], 
 })
 export class AwsModule {}

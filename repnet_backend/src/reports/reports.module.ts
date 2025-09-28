@@ -4,14 +4,18 @@ import { ReportsController } from './reports.controller';
 import { PrismaModule } from 'src/prisma/prisma.module';
 import { AuthModule } from 'src/auth/auth.module';
 import { SitesModule } from 'src/sites/sites.module';
+import { EvidencesModule } from 'src/evidences/evidences.module';
+import { AwsModule } from 'src/aws/aws.module';
 
 @Module({
   providers: [ReportsService],
   controllers: [ReportsController],
   imports: [
-    PrismaModule, 
+    PrismaModule,  
     AuthModule, 
-    SitesModule
+    AwsModule, 
+    EvidencesModule, 
+    SitesModule, 
   ], 
   exports: [ReportsService], 
 })

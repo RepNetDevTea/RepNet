@@ -2,7 +2,6 @@ import { Transform, Type } from "class-transformer";
 import { 
   IsArray, 
   IsNotEmpty, 
-  IsOptional, 
   IsString, 
   IsUrl 
 } from "class-validator";
