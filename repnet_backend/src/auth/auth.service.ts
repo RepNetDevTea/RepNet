@@ -51,10 +51,14 @@ export class AuthService {
     return { userId };
   }
 
-  async updateHashedRefreshToken(userId: number, hashedRefreshToken: string | null) {
+  async updateHashedRefreshToken(userId: number, refreshToken: string | null) {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
     if (!user)
       throw new NotFoundException('No user found');
+
+    let hashedRefreshToken = refreshToken;
+    if (hashedRefreshToken)
+      hashedRefreshToken = await argon2.hash(refreshToken!);
 
     await this.prisma.user.update({
       where: { id: user.id }, 

@@ -65,17 +65,17 @@ model Evidence {
 
 model Site {
   id Int @default(autoincrement()) @id
-  siteDomain String?
+  siteDomain String @unique
   siteReputation Int @default(0)
   reports Report[]
 
-  updatedAt DateTime
+  updatedAt DateTime @default(now())
   createdAt DateTime @default(now())
 }
 
 model Tag {
   id Int @default(autoincrement()) @id
-  tagName String
+  tagName String @unique
   tagScore Int
   reports ReportTags[]
 
@@ -97,7 +97,7 @@ model ReportTags {
 model Report {
   id Int @default(autoincrement()) @id
   reportTitle String
-  reportUrl String?
+  reportUrl String
   reportDescription String
   // report status available: approved, pending, rejected
   reportStatus String @default("pending")
@@ -127,9 +127,9 @@ model ReportImpacts {
 
 model Impact {
   id Int @default(autoincrement()) @id
-  impactName String
+  impactName String @unique
   impactScore Int
-  impactDescription String
+  impactDescription String @unique
   reports ReportImpacts[]
 
   updatedAt DateTime @default(now())

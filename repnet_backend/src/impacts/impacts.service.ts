@@ -6,8 +6,8 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export class ImpactsService {
   constructor(private prisma: PrismaService) {}
 
-  async findImpactById(impactId: number) {
-    return await this.prisma.impact.findUnique({ where: { id: impactId } });
+  async findImpact(filter: Prisma.ImpactWhereUniqueInput) {
+    return await this.prisma.impact.findUnique({ where: filter });
   }
 
   async createImpact(data: Prisma.ImpactCreateInput) {
@@ -19,7 +19,7 @@ export class ImpactsService {
   }
   
   async updateImpact(impactId: number, data: Prisma.ImpactUpdateInput) {
-    const impact = await this.findImpactById(impactId);
+    const impact = await this.findImpact({ id: impactId });
     if (!impact)
       return null;
 
@@ -34,7 +34,7 @@ export class ImpactsService {
   }
   
   async deleteImpact(impactId: number) {
-    const impact = await this.findImpactById(impactId);
+    const impact = await this.findImpact({ id: impactId });
     if (!impact)
       return null;
 
