@@ -14,7 +14,8 @@ import { APP_GUARD } from '@nestjs/core';
       provide: APP_GUARD,
       useClass: ThrottlerGuard, 
     }, 
-  ],
+  ], 
+  controllers: [], 
   imports: [
     PrismaModule, 
     AuthModule,

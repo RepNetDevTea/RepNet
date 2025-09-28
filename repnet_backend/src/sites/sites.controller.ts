@@ -7,17 +7,17 @@ import { UpdateSiteDto } from './dtos/update-site.dto';
 export class SitesController {
   constructor(private sitesService: SitesService) {}
 
-  @Post('create')
+  @Post('')
   async createSite(@Body() body: CreateSiteDto) {
     return await this.sitesService.createSite(body);
   }
 
-  @Get('all')
+  @Get('')
   async getAllSites() {
     return await this.sitesService.getAllSites();
   }
 
-  @Patch('update/:id')
+  @Patch(':id')
   async updateSite(
     @Param('id', new ParseIntPipe) id: number, 
     @Body() body: UpdateSiteDto
@@ -25,7 +25,7 @@ export class SitesController {
     return await this.sitesService.updateSite(id, body);
   }
 
-  @Delete('delete/:id')
+  @Delete(':id')
   async deleteSite(@Param('id', new ParseIntPipe) id: number) {
     return await this.sitesService.deleteSite(id);
   }  

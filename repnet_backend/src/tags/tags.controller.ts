@@ -7,17 +7,17 @@ import { UpdateTagDto } from './dtos/update-tag.dto';
 export class TagsController {
   constructor(private tagsService: TagsService) {}
   
-  @Post('create')
+  @Post('')
   async createTag(@Body() body: CreateTagDto) {
     return await this.tagsService.createTag(body);
   }
 
-  @Get('all')
+  @Get('')
   async getAllTags() {
     return await this.tagsService.getAllTags();
   }
 
-  @Patch('update/:id')
+  @Patch(':id')
   async updateTag(
     @Param('id', new ParseIntPipe) id: number, 
     @Body() body: UpdateTagDto
@@ -25,7 +25,7 @@ export class TagsController {
     return await this.tagsService.updateTag(id, body);
   }
 
-  @Delete('delete/:id')
+  @Delete(':id')
   async deleteTag(@Param('id', new ParseIntPipe) id: number) {
     return await this.tagsService.deleteTag(id);
   }  

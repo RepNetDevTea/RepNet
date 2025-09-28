@@ -10,9 +10,10 @@ import { ReportsModule } from './reports/reports.module';
 import { SitesModule } from './sites/sites.module';
 import { EvidencesModule } from './evidences/evidences.module';
 import { AwsModule } from './aws/aws.module';
+import { VotesModule } from './votes/votes.module';
 
 @Module({
-  imports: [PrismaModule, AuthModule, UsersModule, TagsModule, ImpactsModule, ReportsModule, SitesModule, EvidencesModule, AwsModule],
+  imports: [PrismaModule, AuthModule, UsersModule, TagsModule, ImpactsModule, ReportsModule, SitesModule, EvidencesModule, AwsModule, VotesModule],
   controllers: [AppController],
   providers: [AppService],
 })

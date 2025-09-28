@@ -12,20 +12,20 @@ export class UsersController {
     private userService: UsersService, 
   ) {}
 
-  @Post('signup')
+  @Post('')
   async createUser(@Body() body: CreateUserDto) {
     const { newUser, accessToken, refreshToken } = await this.userService.createUser(body);
     return { newUser, accessToken, refreshToken };
   }
   
-  @Patch('update')
+  @Patch('me')
   @UseGuards(AccessJwtAuthGuard)
   async updateUser(@Req() req: Request, @Body() body: UpdateUserDto) {
     const { id } = classToPlain(req.user);
     return await this.userService.updateUser(id, body);
   }
 
-  @Delete('delete')
+  @Delete('me')
   @UseGuards(AccessJwtAuthGuard)
   async deleteUser(@Req() req: Request) {
     const { id } = classToPlain(req.user);

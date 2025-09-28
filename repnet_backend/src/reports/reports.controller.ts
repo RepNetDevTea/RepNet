@@ -1,5 +1,5 @@
 import { 
-  Body, Controller, FileTypeValidator, Inject, MaxFileSizeValidator, Param, 
+  Body, Controller, Delete, FileTypeValidator, Get, Inject, MaxFileSizeValidator, NotFoundException, Param, 
   ParseFilePipe, ParseIntPipe, Post, Req, UploadedFile, UseGuards, 
   UseInterceptors 
 } from '@nestjs/common';
@@ -15,18 +15,20 @@ import s3Config from 'src/aws/config/s3.config';
 import type { ConfigType } from '@nestjs/config';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { S3Service } from 'src/aws/s3.service';
+import { UsersService } from 'src/users/users.service';
 
 @Controller('reports')
 export class ReportsController {
   constructor(
     private reportsService: ReportsService, 
     private evidencesService: EvidencesService, 
-    private sitesService: SitesService, 
+    private sitesService: SitesService,
+    private usersService: UsersService, 
     @Inject(s3Config.KEY) private s3Configuration: ConfigType<typeof s3Config>,
     private s3Service: S3Service,  
   ) {}
   
-  @Post('create')
+  @Post('')
   @UseGuards(AccessJwtAuthGuard)
   async createReport(@Req() req: Request, @Body() body: CreateReportDto) {
     const { tags, impacts, ...data} = body;
@@ -49,10 +51,10 @@ export class ReportsController {
     // y tags para calcular la severidad base del reporte (tal vez se haga aquí o en alguna función de repors service).
   }
 
-  @Post(':id/evidences')
+  @Post(':reportId/evidences')
   @UseInterceptors(FileInterceptor('file'))
   async createEvidence(
-    @Param('id', new ParseIntPipe) id: number, 
+    @Param('reportId', new ParseIntPipe) reportId: number, 
     @UploadedFile(
       new ParseFilePipe({ 
         validators: [
@@ -78,7 +80,37 @@ export class ReportsController {
       evidenceKey: key, 
     };
 
-    const report = await this.evidencesService.createEvidence(id, evidence);
+    const report = await this.evidencesService.createEvidence(reportId, evidence);
     return report;
   }
+
+  @Get('')
+  async getAllReports() {
+    const reports = await this.reportsService.getAllReports();
+    if (!reports)
+      throw new NotFoundException('Theres no reports to display');
+
+    return reports;
+  }
+
+  @Get('/:id')
+  async getUserReports(@Param('id', new ParseIntPipe) id: number) {
+    const user = await this.usersService.findUserById(id);
+    if (!user)
+      throw new NotFoundException('No user was found');
+
+    const userReports = await this.reportsService.getUserReports(user.id);
+    if (!userReports)
+      throw new NotFoundException('User has not created a single report');
+
+    return userReports;
+  }
+
+  @Delete('/:id')
+  @UseGuards(AccessJwtAuthGuard)
+  async deleteUserReports(@Param('id', new ParseIntPipe) id: number) {
+    
+  }
+
+  
 }
