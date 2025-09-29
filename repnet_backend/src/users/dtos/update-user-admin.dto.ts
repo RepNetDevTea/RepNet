@@ -5,7 +5,7 @@ import {
   IsStrongPassword 
 } from "class-validator";
 
-export class UpdateUserDto {
+export class UpdateUserAdminDto {
   @IsOptional()
   @IsString()
   name: string;
@@ -29,4 +29,12 @@ export class UpdateUserDto {
   @IsOptional()
   @IsStrongPassword()
   hashedPassword: string;
+
+  @IsOptional()
+  @IsString()
+  userRole: string;
+
+  @IsOptional()
+  @IsString()
+  userStatus: string;
 }

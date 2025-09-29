@@ -5,6 +5,7 @@ import { AccessJwtAuthGuard } from 'src/auth/guards/access-jwt-auth.guard';
 import type { Request } from 'express';
 import { classToPlain } from 'class-transformer';
 import { UpdateUserDto } from './dtos/update-user.dto';
+import { UpdateUserAdminDto } from './dtos/update-user-admin.dto';
 
 @Controller('users')
 export class UsersController {
@@ -58,6 +59,15 @@ export class UsersController {
     const { id } = classToPlain(req.user);
     const updatedUser = await this.userService.updateUserById(id, body);
     if (!updatedUser)
+      throw new NotFoundException('The user was not found');
+
+    return updatedUser;
+  }
+
+  @Patch(':userId')
+  async updateUserById(@Param('userId', new ParseIntPipe) userId: number, @Body() body: UpdateUserAdminDto) {
+    const updatedUser = await this.userService.updateUserById(userId, body);
+    if(!updatedUser)
       throw new NotFoundException('The user was not found');
 
     return updatedUser;

@@ -54,8 +54,6 @@ export class UsersService {
     return { newUser, accessToken, refreshToken };
   }
 
-
-
   async updateUserById(userId: number, data: Prisma.UserUpdateInput) {
     const user = await this.findUserById(userId);
     if (!user)
