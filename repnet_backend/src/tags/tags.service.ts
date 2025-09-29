@@ -18,7 +18,7 @@ export class TagsService {
     return await this.prisma.tag.findMany();
   }
   
-  async updateTag(tagId: number, data: Prisma.TagUpdateInput) {
+  async updateTagById(tagId: number, data: Prisma.TagUpdateInput) {
     const tag = await this.findTag({ id: tagId });
     if (!tag)
       return null;
@@ -33,7 +33,7 @@ export class TagsService {
     });
   }
   
-  async deleteTag(tagId: number) {
+  async deleteTagById(tagId: number) {
     const tag = await this.findTag({ id: tagId });
     if (!tag)
       return null;

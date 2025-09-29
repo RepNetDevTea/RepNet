@@ -1,6 +1,6 @@
 import { 
   Body, Controller, Delete, FileTypeValidator, Get, Inject, MaxFileSizeValidator, NotFoundException, Param, 
-  ParseFilePipe, ParseIntPipe, Post, Req, UploadedFile, UseGuards, 
+  ParseFilePipe, ParseIntPipe, Patch, Post, Req, UploadedFile, UseGuards, 
   UseInterceptors 
 } from '@nestjs/common';
 import { ReportsService } from './reports.service';
@@ -15,7 +15,7 @@ import s3Config from 'src/aws/config/s3.config';
 import type { ConfigType } from '@nestjs/config';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { S3Service } from 'src/aws/s3.service';
-import { UsersService } from 'src/users/users.service';
+import { UpdateReportDto } from './dtos/update-report.dto';
 
 @Controller('reports')
 export class ReportsController {
@@ -23,7 +23,6 @@ export class ReportsController {
     private reportsService: ReportsService, 
     private evidencesService: EvidencesService, 
     private sitesService: SitesService,
-    private usersService: UsersService, 
     @Inject(s3Config.KEY) private s3Configuration: ConfigType<typeof s3Config>,
     private s3Service: S3Service,  
   ) {}
@@ -88,29 +87,38 @@ export class ReportsController {
   async getAllReports() {
     const reports = await this.reportsService.getAllReports();
     if (!reports)
-      throw new NotFoundException('Theres no reports to display');
+      throw new NotFoundException('There are no reports to display');
 
     return reports;
   }
 
-  @Get('/:id')
-  async getUserReports(@Param('id', new ParseIntPipe) id: number) {
-    const user = await this.usersService.findUserById(id);
-    if (!user)
-      throw new NotFoundException('No user was found');
+  @Get(':reportId')
+  async getReport(@Param('reportId', new ParseIntPipe) reportId: number) {
+    const report = await this.reportsService.findReportById(reportId);
+    if (!report)
+      throw new NotFoundException('The report does not exist');
 
-    const userReports = await this.reportsService.getUserReports(user.id);
-    if (!userReports)
-      throw new NotFoundException('User has not created a single report');
-
-    return userReports;
+    return report;
   }
 
-  @Delete('/:id')
-  @UseGuards(AccessJwtAuthGuard)
-  async deleteUserReports(@Param('id', new ParseIntPipe) id: number) {
+  @Patch(':reportId')
+  async updateReport(@Param('reportId', new ParseIntPipe) reportId: number, @Body() body: UpdateReportDto) {
+    const { tags, impacts, ...attrsToUpdate } = body;
+    const deletedReport = await this.reportsService.updateReportById(reportId, attrsToUpdate);
+    if (!deletedReport)
+      throw new NotFoundException('The report does no exist');
     
+
+
+    return deletedReport;
   }
 
-  
+  @Delete(':reportId')
+  async deleteReport(@Param('reportId', new ParseIntPipe) reportId: number) {
+    const deletedReport = await this.reportsService.deleteReportById(reportId);
+    if (!deletedReport)
+      throw new NotFoundException('The report does no exist');
+
+    return deletedReport;
+  }
 }

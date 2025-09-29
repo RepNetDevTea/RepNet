@@ -21,16 +21,15 @@ export class ReportsService {
     });
   }
 
-  async getUserReports(userId: number) {
-    return await this.prisma.report.findMany({ 
-      where: { userId }, 
-      include: { 
-        votes: true, 
-        evidences: true,
-        tags: true,
-        impacts: true
-      } 
-    });
+  async findReportById(reportId: number) {
+    return await this.prisma.report.findUnique({ where: { id: reportId } });
   }
 
+  async deleteReportById(reportId: number) {
+    return await this.prisma.report.delete({ where: { id: reportId } });  
+  }
+
+  async updateReportById(reportId: number, data: Prisma.ReportUpdateInput) {
+    return await this.prisma.report.update({ where: { id: reportId }, data });  
+  }
 }

@@ -22,14 +22,14 @@ export class UsersController {
   @UseGuards(AccessJwtAuthGuard)
   async updateUser(@Req() req: Request, @Body() body: UpdateUserDto) {
     const { id } = classToPlain(req.user);
-    return await this.userService.updateUser(id, body);
+    return await this.userService.updateUserById(id, body);
   }
 
   @Delete('me')
   @UseGuards(AccessJwtAuthGuard)
   async deleteUser(@Req() req: Request) {
     const { id } = classToPlain(req.user);
-    const deletedUser = await this.userService.deleteUser(id);
+    const deletedUser = await this.userService.deleteUserById(id);
     return deletedUser;
   }
 }

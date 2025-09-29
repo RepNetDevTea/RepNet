@@ -17,16 +17,16 @@ export class TagsController {
     return await this.tagsService.getAllTags();
   }
 
-  @Patch(':id')
+  @Patch(':tagId')
   async updateTag(
-    @Param('id', new ParseIntPipe) id: number, 
+    @Param('tagId', new ParseIntPipe) tagId: number, 
     @Body() body: UpdateTagDto
   ) {
-    return await this.tagsService.updateTag(id, body);
+    return await this.tagsService.updateTagById(tagId, body);
   }
 
-  @Delete(':id')
-  async deleteTag(@Param('id', new ParseIntPipe) id: number) {
-    return await this.tagsService.deleteTag(id);
+  @Delete(':tagId')
+  async deleteTag(@Param('tagId', new ParseIntPipe) tagId: number) {
+    return await this.tagsService.deleteTagById(tagId);
   }  
 }

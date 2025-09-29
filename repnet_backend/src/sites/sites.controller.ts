@@ -17,16 +17,16 @@ export class SitesController {
     return await this.sitesService.getAllSites();
   }
 
-  @Patch(':id')
+  @Patch(':siteId')
   async updateSite(
-    @Param('id', new ParseIntPipe) id: number, 
+    @Param('siteId', new ParseIntPipe) siteId: number, 
     @Body() body: UpdateSiteDto
   ) {
-    return await this.sitesService.updateSite(id, body);
+    return await this.sitesService.updateSiteById(siteId, body);
   }
 
-  @Delete(':id')
-  async deleteSite(@Param('id', new ParseIntPipe) id: number) {
-    return await this.sitesService.deleteSite(id);
+  @Delete(':siteId')
+  async deleteSite(@Param('siteId', new ParseIntPipe) siteId: number) {
+    return await this.sitesService.deleteSiteById(siteId);
   }  
 }

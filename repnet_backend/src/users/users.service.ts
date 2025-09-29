@@ -44,7 +44,7 @@ export class UsersService {
     return { newUser, accessToken, refreshToken };
   }
 
-  async updateUser(userId: number, data: Prisma.UserUpdateInput) {
+  async updateUserById(userId: number, data: Prisma.UserUpdateInput) {
     const user = await this.findUserById(userId);
     if (!user)
       return null;
@@ -62,7 +62,7 @@ export class UsersService {
     });
   }
 
-  async deleteUser(userId: number) {
+  async deleteUserById(userId: number) {
     const user = await this.findUserById(userId);
     if (!user)
       return null;

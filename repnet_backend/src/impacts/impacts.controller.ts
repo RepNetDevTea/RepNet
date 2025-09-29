@@ -18,16 +18,16 @@ export class ImpactsController {
     return await this.impactsService.getAllImpacts();
   }
 
-  @Patch(':id')
+  @Patch(':impactId')
   async updateImpact(
-    @Param('id', new ParseIntPipe) id: number, 
+    @Param('impactId', new ParseIntPipe) impactId: number, 
     @Body() body: UpdateImpactDto
   ) {
-    return await this.impactsService.updateImpact(id, body);
+    return await this.impactsService.updateImpact(impactId, body);
   }
 
-  @Delete(':id')
-  async deleteImpact(@Param('id', new ParseIntPipe) id: number) {
-    return await this.impactsService.deleteImpact(id);
+  @Delete(':impactId')
+  async deleteImpact(@Param('impactId', new ParseIntPipe) impactId: number) {
+    return await this.impactsService.deleteImpact(impactId);
   } 
 }

@@ -18,7 +18,7 @@ export class SitesService {
     return await this.prisma.site.findMany();
   }
   
-  async updateSite(siteId: number, data: Prisma.SiteUpdateInput) {
+  async updateSiteById(siteId: number, data: Prisma.SiteUpdateInput) {
     const site = await this.findSite({ id: siteId });
     if (!site)
       return null;
@@ -33,7 +33,7 @@ export class SitesService {
     });
   }
   
-  async deleteSite(siteId: number) {
+  async deleteSiteById(siteId: number) {
     const site = await this.findSite({ id: siteId });
     if (!site)
       return null;
