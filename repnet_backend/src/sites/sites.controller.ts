@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpException, NotFoundException, Param, ParseIntPipe, Patch, Post } from '@nestjs/common';
 import { SitesService } from './sites.service';
 import { CreateSiteDto } from './dtos/create-site.dto';
 import { UpdateSiteDto } from './dtos/update-site.dto';
@@ -9,12 +9,29 @@ export class SitesController {
 
   @Post('')
   async createSite(@Body() body: CreateSiteDto) {
-    return await this.sitesService.createSite(body);
+    const createdSite = await this.sitesService.createSite(body);
+    if (!createdSite)
+      throw new HttpException('Something went wrong while creating the site', 500);
+
+    return createdSite;
   }
 
   @Get('')
   async getAllSites() {
-    return await this.sitesService.getAllSites();
+    const sites = await this.sitesService.getAllSites();
+    if(sites)
+      throw new HttpException('There are no sites', 400);
+
+    return sites;
+  }
+
+  @Get(':siteId')
+  async getSiteById(@Param('sitId', new ParseIntPipe) siteId: number) {
+    const site = await this.sitesService.findSite({ id: siteId });
+    if (!site)
+      throw new NotFoundException('The site was not found');
+
+    return site;
   }
 
   @Patch(':siteId')
@@ -22,11 +39,19 @@ export class SitesController {
     @Param('siteId', new ParseIntPipe) siteId: number, 
     @Body() body: UpdateSiteDto
   ) {
-    return await this.sitesService.updateSiteById(siteId, body);
+    const updatedSite = await this.sitesService.updateSiteById(siteId, body);
+    if (!updatedSite)
+      throw new NotFoundException('The site was not found');
+
+    return updatedSite;
   }
 
   @Delete(':siteId')
   async deleteSite(@Param('siteId', new ParseIntPipe) siteId: number) {
-    return await this.sitesService.deleteSiteById(siteId);
+    const deletedSite = await this.sitesService.deleteSiteById(siteId);
+    if (deletedSite)
+      throw new NotFoundException('The site war nt found');
+
+    return deletedSite;
   }  
 }

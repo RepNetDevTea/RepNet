@@ -24,4 +24,12 @@ export class UpdateUserDto {
   @IsOptional()
   @IsStrongPassword()
   hashedPassword: string;
+
+  @IsOptional()
+  @IsString()
+  userRole: string;
+
+  @IsOptional()
+  @IsString()
+  userStatus: string;
 }

@@ -7,7 +7,10 @@ export class ImpactsService {
   constructor(private prisma: PrismaService) {}
 
   async findImpact(filter: Prisma.ImpactWhereUniqueInput) {
-    return await this.prisma.impact.findUnique({ where: filter });
+    return await this.prisma.impact.findUnique({ 
+      where: filter,
+      include: { reports: true }, 
+    });
   }
 
   async createImpact(data: Prisma.ImpactCreateInput) {
@@ -15,7 +18,7 @@ export class ImpactsService {
   }
   
   async getAllImpacts() {
-    return await this.prisma.impact.findMany();
+    return await this.prisma.impact.findMany({ include: { reports: true }});
   }
   
   async updateImpact(impactId: number, data: Prisma.ImpactUpdateInput) {

@@ -26,10 +26,18 @@ export class ReportsService {
   }
 
   async deleteReportById(reportId: number) {
-    return await this.prisma.report.delete({ where: { id: reportId } });  
+    const report = await this.findReportById(reportId);
+    if (!report)
+      return null;
+
+    return await this.prisma.report.delete({ where: { id: report.id } });  
   }
 
   async updateReportById(reportId: number, data: Prisma.ReportUpdateInput) {
-    return await this.prisma.report.update({ where: { id: reportId }, data });  
+    const report = await this.findReportById(reportId);
+    if (!report)
+      return null;
+
+    return await this.prisma.report.update({ where: { id: report.id }, data });  
   }
 }

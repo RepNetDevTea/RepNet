@@ -7,7 +7,10 @@ export class SitesService {
   constructor(private prisma: PrismaService) {}
 
   async findSite(filter: Prisma.SiteWhereUniqueInput) {
-    return await this.prisma.site.findUnique({ where: filter });
+    return await this.prisma.site.findUnique({ 
+      where: filter, 
+      include: { reports: true } 
+    });
   }
 
   async createSite(data: Prisma.SiteCreateInput) {
@@ -15,7 +18,7 @@ export class SitesService {
   }
   
   async getAllSites() {
-    return await this.prisma.site.findMany();
+    return await this.prisma.site.findMany({ include: { reports: true } });
   }
   
   async updateSiteById(siteId: number, data: Prisma.SiteUpdateInput) {

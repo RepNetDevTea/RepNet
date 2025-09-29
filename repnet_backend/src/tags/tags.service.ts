@@ -6,8 +6,11 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export class TagsService {
   constructor(private prisma: PrismaService) {}
 
-  async findTag(filter: Prisma.TagWhereUniqueInput) {
-    return await this.prisma.tag.findUnique({ where: filter });
+  async findTagByFilter(filter: Prisma.TagWhereUniqueInput) {
+    return await this.prisma.tag.findUnique({ 
+      where: filter, 
+      include: { reports: true } 
+    });
   }
 
   async createTag(data: Prisma.TagCreateInput) {
@@ -19,7 +22,7 @@ export class TagsService {
   }
   
   async updateTagById(tagId: number, data: Prisma.TagUpdateInput) {
-    const tag = await this.findTag({ id: tagId });
+    const tag = await this.findTagByFilter({ id: tagId });
     if (!tag)
       return null;
 
@@ -34,7 +37,7 @@ export class TagsService {
   }
   
   async deleteTagById(tagId: number) {
-    const tag = await this.findTag({ id: tagId });
+    const tag = await this.findTagByFilter({ id: tagId });
     if (!tag)
       return null;
 

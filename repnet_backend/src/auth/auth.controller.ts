@@ -15,8 +15,8 @@ export class AuthController {
   @UseGuards(LocalAuthGuard)
   async logInUser(@Req() req: Request) {
     const user = classToPlain(req.user);
-    const { id, email, username, role } = user;
-    const payload = { id, username, email, role };
+    const { id, email, username, userRole, userStatus } = user;
+    const payload = { id, username, email, userRole, userStatus };
     const { accessToken, refreshToken } = await this.authService.generateTokens(id, payload);
     await this.authService.updateHashedRefreshToken(id, refreshToken);
     
@@ -27,16 +27,15 @@ export class AuthController {
   @UseGuards(RefreshJwtAuthGuard)
   async refreshToken(@Req() req: Request) {
     const user = classToPlain(req.user);
-    const { id, email, username, role } = user;
-    const payload = { id, email, username, role };
+    const { id, email, username, userRole, userStatus } = user;
+    const payload = { id, email, username, userRole, userStatus };
     return await this.authService.refreshTokens(id, payload);
   }
 
   @Post('logout')
   @UseGuards(AccessJwtAuthGuard)
   async logOutUser(@Req() req: Request) {
-    const user = classToPlain(req.user);
-    const { id } = user;
+    const { id } = classToPlain(req.user);
     return await this.authService.logOut(id);
   }
 }

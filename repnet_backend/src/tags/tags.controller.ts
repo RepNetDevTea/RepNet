@@ -1,7 +1,8 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, NotFoundException, Param, ParseIntPipe, Patch, Post } from '@nestjs/common';
 import { CreateTagDto } from './dtos/create-tag.dto';
 import { TagsService } from './tags.service';
 import { UpdateTagDto } from './dtos/update-tag.dto';
+import { PutBucketNotificationConfigurationCommand } from '@aws-sdk/client-s3';
 
 @Controller('tags')
 export class TagsController {
@@ -15,6 +16,15 @@ export class TagsController {
   @Get('')
   async getAllTags() {
     return await this.tagsService.getAllTags();
+  }
+
+  @Get(':tagId')
+  async getTagById(@Param('tagId', new ParseIntPipe) tagId: number) {
+    const tag = await this.tagsService.findTagByFilter({ id: tagId });
+    if (!tag)
+      throw new NotFoundException('The tag was not found');
+
+    return tag;
   }
 
   @Patch(':tagId')

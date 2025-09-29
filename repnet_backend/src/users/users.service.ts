@@ -23,16 +23,26 @@ export class UsersService {
   }
 
   async findUserById(userId: number) {
-    return await this.prisma.user.findUnique({ where: { id: userId } });
+    return await this.prisma.user.findUnique({ 
+      where: { id: userId }, 
+      include: { votes: true, reports: true }
+    });
   } 
   
+  async getUsers(filter: object | null) {
+    if (!filter)
+      return await this.prisma.user.findMany();
+    
+    return await this.prisma.user.findMany({ where: filter });
+  }
+
   async createUser(data: Prisma.UserCreateInput) {
     data.hashedPassword = await this.hashPassword(data.hashedPassword);
 
     const newUser = await this.prisma.user.create({ data });   
     
-    const { id, username, email, userRole } = newUser;
-    const payload = { id, username, email, userRole };
+    const { id, username, email, userRole, userStatus } = newUser;
+    const payload = { id, username, email, userRole, userStatus };
     const { accessToken, refreshToken } = await this.authService.generateTokens(id, payload);
     const hashedRefreshToken = await argon2.hash(refreshToken);
 
@@ -43,6 +53,8 @@ export class UsersService {
 
     return { newUser, accessToken, refreshToken };
   }
+
+
 
   async updateUserById(userId: number, data: Prisma.UserUpdateInput) {
     const user = await this.findUserById(userId);

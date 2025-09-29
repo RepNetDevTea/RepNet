@@ -1,5 +1,5 @@
 import { 
-  Body, Controller, Delete, FileTypeValidator, Get, Inject, MaxFileSizeValidator, NotFoundException, Param, 
+  Body, Controller, Delete, FileTypeValidator, Get, HttpException, Inject, MaxFileSizeValidator, NotFoundException, Param, 
   ParseFilePipe, ParseIntPipe, Patch, Post, Req, UploadedFile, UseGuards, 
   UseInterceptors 
 } from '@nestjs/common';
@@ -30,7 +30,7 @@ export class ReportsController {
   @Post('')
   @UseGuards(AccessJwtAuthGuard)
   async createReport(@Req() req: Request, @Body() body: CreateReportDto) {
-    const { tags, impacts, ...data} = body;
+    const { tags, impacts, ...reportData} = body;
     const userId = classToPlain(req.user).id;
 
     const parsedUrl = parse(body.reportUrl.toLowerCase());
@@ -39,13 +39,17 @@ export class ReportsController {
     const existingSite = await this.sitesService.findSite({ siteDomain: domain });
     const site = existingSite ?? await this.sitesService.createSite({ siteDomain: domain });
 
-    const report = {
-      ...data,
+    const data = {
+      ...reportData,
       user: { connect: { id: userId } },
       site: { connect: { id: site.id } }, 
     }
   
-    return await this.reportsService.createReport(report);
+    const report = await this.reportsService.createReport(data);
+    if (!report)
+      throw new HttpException('Something went wrong while creating the report', 500);
+
+    return report;
     // Tenemos dos arreglos de referencias de tags e impactos para consultar los impactos    
     // y tags para calcular la severidad base del reporte (tal vez se haga aquí o en alguna función de repors service).
   }
@@ -73,21 +77,24 @@ export class ReportsController {
     const key = originalname;
     const evidenceFileUrl = `https://${bucketName}.s3.${region}.amazonaws.com/${encodeURIComponent(key)}`;
 
-    const evidence = {
+    const data = {
       evidenceType: mimetype, 
       evidenceFileUrl, 
       evidenceKey: key, 
     };
 
-    const report = await this.evidencesService.createEvidence(reportId, evidence);
-    return report;
+    const evidence = await this.evidencesService.createEvidence(reportId, data);
+    if (!evidence)
+      throw new HttpException('Something went wrong while creating the evidence', 500);
+
+    return evidence;
   }
 
   @Get('')
   async getAllReports() {
     const reports = await this.reportsService.getAllReports();
     if (!reports)
-      throw new NotFoundException('There are no reports to display');
+      throw new NotFoundException('There are no reports');
 
     return reports;
   }
@@ -96,7 +103,7 @@ export class ReportsController {
   async getReport(@Param('reportId', new ParseIntPipe) reportId: number) {
     const report = await this.reportsService.findReportById(reportId);
     if (!report)
-      throw new NotFoundException('The report does not exist');
+      throw new NotFoundException('The report was not found');
 
     return report;
   }
@@ -104,20 +111,18 @@ export class ReportsController {
   @Patch(':reportId')
   async updateReport(@Param('reportId', new ParseIntPipe) reportId: number, @Body() body: UpdateReportDto) {
     const { tags, impacts, ...attrsToUpdate } = body;
-    const deletedReport = await this.reportsService.updateReportById(reportId, attrsToUpdate);
-    if (!deletedReport)
-      throw new NotFoundException('The report does no exist');
-    
+    const updatedReport = await this.reportsService.updateReportById(reportId, attrsToUpdate);
+    if (!updatedReport)
+      throw new NotFoundException('The report was not found');
 
-
-    return deletedReport;
+    return updatedReport;
   }
 
   @Delete(':reportId')
   async deleteReport(@Param('reportId', new ParseIntPipe) reportId: number) {
     const deletedReport = await this.reportsService.deleteReportById(reportId);
     if (!deletedReport)
-      throw new NotFoundException('The report does no exist');
+      throw new NotFoundException('The report was not found');
 
     return deletedReport;
   }
