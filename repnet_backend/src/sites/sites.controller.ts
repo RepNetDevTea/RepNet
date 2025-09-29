@@ -50,8 +50,22 @@ export class SitesController {
   async deleteSite(@Param('siteId', new ParseIntPipe) siteId: number) {
     const deletedSite = await this.sitesService.deleteSiteById(siteId);
     if (deletedSite)
-      throw new NotFoundException('The site war nt found');
+      throw new NotFoundException('The site was not found');
 
     return deletedSite;
   }  
+
+  @Get(':siteId/reputation')
+  async getSiteReputationById(@Param('siteId', new ParseIntPipe) siteId: number) {
+    const site = await this.sitesService.findSite({ id: siteId });
+    if (!site)
+      throw new NotFoundException('The site was not found');
+
+    const { reports } = site;
+    const accumulatedSeverity = reports.reduce((accum, report) => {
+      return accum + report.severity;
+    }, 0);
+    const reputation = accumulatedSeverity / reports.length;
+    return reputation;
+  }
 }
