@@ -26,7 +26,7 @@ struct PrimaryButtonComponent: View {
         .disabled(!isEnabled)
     }
 }
-//Preview creado con gemini
+
 #Preview {
     VStack(spacing: 20) {
         PrimaryButtonComponent(title: "Botón Activado", action: {}, isEnabled: true)
