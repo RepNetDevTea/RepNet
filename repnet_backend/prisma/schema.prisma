@@ -46,6 +46,8 @@ model Vote {
   report Report @relation(fields: [reportId], references: [id])
   reportId Int
 
+  @@unique([userId, reportId])
+
   updatedAt DateTime @default(now())
   createdAt DateTime @default(now())
 }

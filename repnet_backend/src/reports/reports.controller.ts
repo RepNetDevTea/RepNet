@@ -16,6 +16,7 @@ import type { ConfigType } from '@nestjs/config';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { S3Service } from 'src/aws/s3.service';
 import { UpdateReportDto } from './dtos/update-report.dto';
+import { VotesService } from 'src/votes/votes.service';
 
 @Controller('reports')
 export class ReportsController {
@@ -23,6 +24,7 @@ export class ReportsController {
     private reportsService: ReportsService, 
     private evidencesService: EvidencesService, 
     private sitesService: SitesService,
+    private votesService: VotesService, 
     @Inject(s3Config.KEY) private s3Configuration: ConfigType<typeof s3Config>,
     private s3Service: S3Service,  
   ) {}
@@ -126,4 +128,46 @@ export class ReportsController {
 
     return deletedReport;
   }
+  
+  @Post(':reportId/toggleVote')
+  @UseGuards(AccessJwtAuthGuard)
+  async toggleDownvote(
+    @Req() req: Request, 
+    @Param('reportId', new ParseIntPipe) reportId: number, 
+    @Body() { voteType }: any
+  ) {
+    const userId = classToPlain(req.user).id
+
+    if (!voteType) {
+      const deletedDownvote = await this.votesService.deleteVote({ userId, reportId });
+      if (!deletedDownvote)
+        throw new NotFoundException('The vote was not foun');
+      
+      return deletedDownvote;
+    }
+
+    const data = {
+      voteType, 
+      userId: { connect: { id: userId } }, 
+      reportId: { connect: { id: reportId } }, 
+    }
+
+    const upVote = await this.votesService.createVote(data);
+    if (!upVote)
+      throw new HttpException('Something went wrong while storing upvote', 500);
+
+    return upVote;
+  }
+
+  @Get(':reportsId/upvotes')
+  async getReportUpvotes(@Param('reportId', new ParseIntPipe) reportId: number, @Body() body: any) {
+    
+  }
+
+
+  @Get(':reportsId/downvotes')
+  async getReportDownvotes(@Param('reportId', new ParseIntPipe) reportId: number, @Body() body: any) {
+    
+  }
+
 }
