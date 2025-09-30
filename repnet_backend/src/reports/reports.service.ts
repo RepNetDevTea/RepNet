@@ -22,7 +22,15 @@ export class ReportsService {
   }
 
   async findReportById(reportId: number) {
-    return await this.prisma.report.findUnique({ where: { id: reportId } });
+    return await this.prisma.report.findUnique({ 
+      where: { id: reportId }, 
+      include: { 
+        votes: true, 
+        evidences: true, 
+        tags: true, 
+        impacts: true 
+      } 
+    });
   }
 
   async deleteReportById(reportId: number) {

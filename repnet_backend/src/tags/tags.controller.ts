@@ -8,12 +8,12 @@ import { PutBucketNotificationConfigurationCommand } from '@aws-sdk/client-s3';
 export class TagsController {
   constructor(private tagsService: TagsService) {}
   
-  @Post('')
+  @Post()
   async createTag(@Body() body: CreateTagDto) {
     return await this.tagsService.createTag(body);
   }
 
-  @Get('')
+  @Get()
   async getAllTags() {
     return await this.tagsService.getAllTags();
   }

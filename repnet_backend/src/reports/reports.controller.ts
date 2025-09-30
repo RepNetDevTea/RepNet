@@ -136,38 +136,26 @@ export class ReportsController {
     @Param('reportId', new ParseIntPipe) reportId: number, 
     @Body() { voteType }: any
   ) {
-    const userId = classToPlain(req.user).id
+    const userId = classToPlain(req.user).id;
 
-    if (!voteType) {
-      const deletedDownvote = await this.votesService.deleteVote({ userId, reportId });
+    if (voteType !== 'downvote' && voteType !== 'upvote') {
+      const deletedDownvote = await this.votesService.deleteVote(userId, reportId);
       if (!deletedDownvote)
         throw new NotFoundException('The vote was not foun');
-      
+
       return deletedDownvote;
     }
 
     const data = {
       voteType, 
-      userId: { connect: { id: userId } }, 
-      reportId: { connect: { id: reportId } }, 
+      user: { connect: { id: userId } }, 
+      report: { connect: { id: reportId } }, 
     }
 
-    const upVote = await this.votesService.createVote(data);
-    if (!upVote)
+    const vote = await this.votesService.createVote(data);
+    if (!vote)
       throw new HttpException('Something went wrong while storing upvote', 500);
 
-    return upVote;
+    return vote;
   }
-
-  @Get(':reportsId/upvotes')
-  async getReportUpvotes(@Param('reportId', new ParseIntPipe) reportId: number, @Body() body: any) {
-    
-  }
-
-
-  @Get(':reportsId/downvotes')
-  async getReportDownvotes(@Param('reportId', new ParseIntPipe) reportId: number, @Body() body: any) {
-    
-  }
-
 }

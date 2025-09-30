@@ -6,17 +6,43 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export class VotesService {
   constructor(private prisma: PrismaService) {}
 
-  async findVote(filter: Prisma.VoteFindUniqueArgs) {
-    return await this.prisma.vote.findUnique(filter);
+  async createVote(data: Prisma.VoteCreateInput) {
+    return await this.prisma.vote.create({ data });
   }
 
-  async createVote() {
-
+  async findVoteById(voteId: number) {
+    return await this.prisma.vote.findUnique({ where: { id: voteId } });
   }
 
-  async deleteVote() {
-
+  async findVote(filter: Prisma.VoteWhereUniqueInput) {
+    return await this.prisma.vote.findUnique({ where: filter });
   }
 
+  async findVotes() {
+    return await this.prisma.vote.findMany();
+  }
 
+  async updateVoteById(reportId: number, data: Prisma.VoteUpdateInput) {
+    const report = await this.findVoteById(reportId);
+    if (!report)
+      return null;
+
+    return await this.prisma.vote.update({ where: { id: report.id }, data });
+  }
+
+  async deleteVote(userId: number, reportId: number) {
+    const vote = await this.findVote({ userId_reportId: { userId, reportId } });
+    if (!vote)
+      return null;
+
+    return await this.prisma.vote.delete({ where: { id: vote.id } });
+  }
+
+  async deleteVoteById(voteId: number) {
+    const vote = await this.findVoteById(voteId);
+    if (!vote)
+      return null;
+
+    return await this.prisma.vote.delete({ where: { id: vote.id } });
+  }
 }
