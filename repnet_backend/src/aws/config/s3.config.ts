@@ -4,6 +4,6 @@ import { S3ClientConfig } from "@aws-sdk/client-s3";
 export default registerAs(
   "s3",
   (): S3ClientConfig => ({
-    region: process.env.AWS_S3_REGION, 
+    region: process.env.AWS_REGION, 
   })
 );

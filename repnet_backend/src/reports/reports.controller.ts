@@ -65,7 +65,7 @@ export class ReportsController {
         validators: [
           new MaxFileSizeValidator({ maxSize: 25 * 1024 * 1024 }), 
           new FileTypeValidator({ 
-            fileType: /^(image\/(png|jpeg|jpg)|application\/(pdf|msword|vnd\.openxmlformats-officedocument\.wordprocessingml\.document))$/
+            fileType: /^(image\/(png|jpeg|jpg))$/
           })
         ] 
       })
@@ -90,6 +90,27 @@ export class ReportsController {
       throw new HttpException('Something went wrong while creating the evidence', 500);
 
     return evidence;
+  }
+
+  @Patch(':reportId/severityScore')
+  async computeSeverityScore(@Param('reportId', new ParseIntPipe) reportId: number) {
+    const report = await this.reportsService.findReportById(reportId);
+    if (!report)
+      throw new NotFoundException('The report was not found');
+
+    const {tags, impacts} = report;
+    // const tagNames = tags.map(({ tag }) => tag.tagName);
+    const tagScores = tags.map(({ tag }) => tag.tagScore);
+    // const impactNames = impacts.map(({ impact }) => impact.impactName);
+    const impactsScores = impacts.map(({ impact }) => impact.impactScore);
+
+    const maxTagScore = Math.max(...tagScores);
+    const maxImpactScore = Math.max(...tagScores);
+
+    const tagsWithMaxtagScore = tags.filter(({ tag }) => tag.tagScore === maxTagScore);
+    const bonusFactor = 0.2;
+    // const tagSeverity = tagsWithMaxtagScore + 
+
   }
 
   @Get()

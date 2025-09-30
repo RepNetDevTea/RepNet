@@ -6,6 +6,7 @@ import { AuthModule } from 'src/auth/auth.module';
 import { SitesModule } from 'src/sites/sites.module';
 import { EvidencesModule } from 'src/evidences/evidences.module';
 import { AwsModule } from 'src/aws/aws.module';
+import { VotesModule } from 'src/votes/votes.module';
 
 @Module({
   providers: [ReportsService],
@@ -16,6 +17,7 @@ import { AwsModule } from 'src/aws/aws.module';
     AwsModule, 
     EvidencesModule, 
     SitesModule, 
+    VotesModule, 
   ], 
   exports: [ReportsService], 
 })

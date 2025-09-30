@@ -1,3 +1,4 @@
+import { Select } from '@chakra-ui/react';
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -27,8 +28,8 @@ export class ReportsService {
       include: { 
         votes: true, 
         evidences: true, 
-        tags: true, 
-        impacts: true 
+        tags: { select: { tag: { select: { tagName: true, tagScore: true } } } }, 
+        impacts: { select: { impact: { select: { id: true, impactName: true, impactScore: true } } } }, 
       } 
     });
   }
