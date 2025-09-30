@@ -7,7 +7,7 @@ import { UpdateImpactDto } from './dtos/update-impact.dto';
 export class ImpactsController {
   constructor(private impactsService: ImpactsService) {}
   
-  @Post('')
+  @Post()
   async createImpact(@Body() body: CreateImpactDto) {
     const createdImpact = await this.impactsService.createImpact(body);
     if (!createdImpact)
@@ -16,7 +16,7 @@ export class ImpactsController {
     return createdImpact;
   }
 
-  @Get('')
+  @Get()
   async getAllImpacts() {
     const impacts = await this.impactsService.getAllImpacts();
     if (!impacts)

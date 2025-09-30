@@ -29,7 +29,7 @@ export class ReportsController {
     private s3Service: S3Service,  
   ) {}
   
-  @Post('')
+  @Post()
   @UseGuards(AccessJwtAuthGuard)
   async createReport(@Req() req: Request, @Body() body: CreateReportDto) {
     const { tags, impacts, ...reportData} = body;
@@ -92,7 +92,7 @@ export class ReportsController {
     return evidence;
   }
 
-  @Get('')
+  @Get()
   async getAllReports() {
     const reports = await this.reportsService.getAllReports();
     if (!reports)

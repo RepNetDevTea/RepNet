@@ -13,7 +13,7 @@ export class UsersController {
     private userService: UsersService, 
   ) {}
 
-  @Post('')
+  @Post()
   async createUser(@Body() body: CreateUserDto) {
     const { newUser, accessToken, refreshToken } = await this.userService.createUser(body);
     if (!newUser)
@@ -22,7 +22,7 @@ export class UsersController {
     return { newUser, accessToken, refreshToken };
   }
 
-  @Get('')
+  @Get()
   async getUsers() {
     const users = await this.userService.getUsers(null);
     if (!users)

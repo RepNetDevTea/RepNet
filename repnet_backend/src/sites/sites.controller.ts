@@ -7,7 +7,7 @@ import { UpdateSiteDto } from './dtos/update-site.dto';
 export class SitesController {
   constructor(private sitesService: SitesService) {}
 
-  @Post('')
+  @Post()
   async createSite(@Body() body: CreateSiteDto) {
     const createdSite = await this.sitesService.createSite(body);
     if (!createdSite)
@@ -16,7 +16,7 @@ export class SitesController {
     return createdSite;
   }
 
-  @Get('')
+  @Get()
   async getAllSites() {
     const sites = await this.sitesService.getAllSites();
     if(sites)
