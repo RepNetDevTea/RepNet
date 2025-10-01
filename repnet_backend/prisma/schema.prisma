@@ -80,7 +80,7 @@ model Tag {
   id Int @default(autoincrement()) @id
   tagName String @unique
   tagScore Int
-  tagDescription String
+  tagDescription String @unique
   reports ReportTags[]
 
   updatedAt DateTime @default(now())

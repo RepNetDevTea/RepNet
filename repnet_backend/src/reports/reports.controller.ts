@@ -17,6 +17,10 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { S3Service } from 'src/aws/s3.service';
 import { UpdateReportDto } from './dtos/update-report.dto';
 import { VotesService } from 'src/votes/votes.service';
+import computeSeverityMetric from './utils/compute-severity-metric';
+import promptBuilder from './utils/promptBuilder';
+import bedrockConfig from 'src/aws/config/bedrock.config';
+import { BedrockService } from 'src/aws/bedrock.service';
 
 @Controller('reports')
 export class ReportsController {
@@ -26,7 +30,9 @@ export class ReportsController {
     private sitesService: SitesService,
     private votesService: VotesService, 
     @Inject(s3Config.KEY) private s3Configuration: ConfigType<typeof s3Config>,
-    private s3Service: S3Service,  
+    private s3Service: S3Service, 
+    @Inject(bedrockConfig) private bedrockConfiguration: ConfigType<typeof bedrockConfig>, 
+    private bedrockService: BedrockService, 
   ) {}
   
   @Post()
@@ -52,8 +58,6 @@ export class ReportsController {
       throw new HttpException('Something went wrong while creating the report', 500);
 
     return report;
-    // Tenemos dos arreglos de referencias de tags e impactos para consultar los impactos    
-    // y tags para calcular la severidad base del reporte (tal vez se haga aquí o en alguna función de repors service).
   }
 
   @Post(':reportId/evidences')
@@ -98,19 +102,38 @@ export class ReportsController {
     if (!report)
       throw new NotFoundException('The report was not found');
 
-    const {tags, impacts} = report;
-    // const tagNames = tags.map(({ tag }) => tag.tagName);
-    const tagScores = tags.map(({ tag }) => tag.tagScore);
-    // const impactNames = impacts.map(({ impact }) => impact.impactName);
-    const impactsScores = impacts.map(({ impact }) => impact.impactScore);
+    const {reportUrl, reportDescription, tags, impacts, evidences } = report;
 
-    const maxTagScore = Math.max(...tagScores);
-    const maxImpactScore = Math.max(...tagScores);
+    const tagWeight = 0.2;
+    const tagsScore = computeSeverityMetric('tag', tags);
+    const realTagScore = tagWeight * tagsScore;
 
-    const tagsWithMaxtagScore = tags.filter(({ tag }) => tag.tagScore === maxTagScore);
-    const bonusFactor = 0.2;
-    // const tagSeverity = tagsWithMaxtagScore + 
+    const impactWeight = 0.35;
+    const impactsScore = computeSeverityMetric('impact', impacts);
+    const realImpactScore = impactWeight * impactsScore;
 
+    const context = {
+      reportUrl, 
+      tags,
+      reportDescription, 
+      impacts, 
+      tagScoreData: {
+        tagWeight, 
+        tagsScore,
+        realTagScore, 
+      },
+      impactScoreData: {
+        impactWeight, 
+        impactsScore,
+        realImpactScore, 
+      }, 
+      evidenceUrls: evidences, 
+    }
+
+    const prompt = promptBuilder(context);
+    const bedrockOutput = this.bedrockService.scoreEvidence(prompt); 
+
+    return bedrockOutput;
   }
 
   @Get()

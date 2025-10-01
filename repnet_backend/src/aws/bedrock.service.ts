@@ -15,11 +15,16 @@ export class BedrockService {
     });
   }
 
-  // async scoreEvidence() {
-  //   return await this.bedrockClient.send(
-  //     new InvokeModelCommand({
-        
-  //     }) 
-  //   )
-  // }
+  async scoreEvidence(context) {
+    const bedrockResponse = await this.bedrockClient.send(
+      new InvokeModelCommand({
+        modelId: 'mistral.pixtral-large-25.02', 
+        contentType: 'application/json', 
+        accept: 'application/json', 
+        body: JSON.stringify(context), 
+      }) 
+    )
+
+    return JSON.parse(new TextDecoder().decode(bedrockResponse.body));
+  }
 }

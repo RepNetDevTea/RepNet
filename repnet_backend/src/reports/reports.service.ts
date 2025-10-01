@@ -24,12 +24,12 @@ export class ReportsService {
 
   async findReportById(reportId: number) {
     return await this.prisma.report.findUnique({ 
-      where: { id: reportId }, 
-      include: { 
+      where: { id: reportId },
+      include: {
         votes: true, 
-        evidences: true, 
-        tags: { select: { tag: { select: { tagName: true, tagScore: true } } } }, 
-        impacts: { select: { impact: { select: { id: true, impactName: true, impactScore: true } } } }, 
+        evidences: { select: { evidenceFileUrl: true } }, 
+        tags: { select: { tag: { select: { tagName: true, tagScore: true, tagDescription: true } } } }, 
+        impacts: { select: { impact: { select: { impactName: true, impactScore: true, impactDescription: true } } } }, 
       } 
     });
   }
