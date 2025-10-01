@@ -47,33 +47,29 @@ struct LoginView: View {
                             .progressViewStyle(CircularProgressViewStyle())
                             .padding()
                     } else {
-                        Button(action: {
-                            Task {
-                                isLoading = true
-                                do {
-                                    let success = try await authController.loginUser(email: email, password: password)
-                                    isLoading = false
-                                    if success {
-                                        isLoggedIn = true
-                                    } else {
-                                        alertMessage = "Credenciales incorrectas"
+                        PrimaryButtonComponent(
+                            title: "Iniciar",
+                            action: {
+                                Task {
+                                    isLoading = true
+                                    do {
+                                        let success = try await authController.loginUser(email: email, password: password)
+                                        isLoading = false
+                                        if success {
+                                            isLoggedIn = true
+                                        } else {
+                                            alertMessage = "Credenciales incorrectas"
+                                            showAlert = true
+                                        }
+                                    } catch {
+                                        isLoading = false
+                                        alertMessage = "Error: \(error.localizedDescription)"
                                         showAlert = true
                                     }
-                                } catch {
-                                    isLoading = false
-                                    alertMessage = "Error: \(error.localizedDescription)"
-                                    showAlert = true
                                 }
                             }
-                        }) {
-                            Text("Iniciar sesión")
-                                .fontWeight(.bold)
-                                .frame(maxWidth: .infinity)
-                                .padding()
-                                .background(Color.blue)
-                                .foregroundColor(.white)
-                                .cornerRadius(16)
-                        }
+                        )
+                        
                     }
 
                     Spacer()

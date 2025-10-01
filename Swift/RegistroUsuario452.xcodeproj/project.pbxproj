@@ -11,7 +11,7 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		8478F8A72E8D662B0057022B /* Exceptions for "RegistroUsuario452" folder in "RegistroUsuario452" target */ = {
+		8478F99C2E8DCC1E0057022B /* Exceptions for "RegistroUsuario452" folder in "RegistroUsuario452" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
@@ -21,10 +21,10 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		D1556A3A2E59382C0019D9A9 /* RegistroUsuario452 */ = {
+		8478F9842E8DCC1E0057022B /* RegistroUsuario452 */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				8478F8A72E8D662B0057022B /* Exceptions for "RegistroUsuario452" folder in "RegistroUsuario452" target */,
+				8478F99C2E8DCC1E0057022B /* Exceptions for "RegistroUsuario452" folder in "RegistroUsuario452" target */,
 			);
 			path = RegistroUsuario452;
 			sourceTree = "<group>";
@@ -45,7 +45,7 @@
 		D1556A2F2E59382C0019D9A9 = {
 			isa = PBXGroup;
 			children = (
-				D1556A3A2E59382C0019D9A9 /* RegistroUsuario452 */,
+				8478F9842E8DCC1E0057022B /* RegistroUsuario452 */,
 				D1556A392E59382C0019D9A9 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -74,7 +74,7 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				D1556A3A2E59382C0019D9A9 /* RegistroUsuario452 */,
+				8478F9842E8DCC1E0057022B /* RegistroUsuario452 */,
 			);
 			name = RegistroUsuario452;
 			packageProductDependencies = (
