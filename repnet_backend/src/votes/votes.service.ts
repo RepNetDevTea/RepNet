@@ -27,7 +27,11 @@ export class VotesService {
     if (!report)
       return null;
 
-    return await this.prisma.vote.update({ where: { id: report.id }, data });
+    const updatedAt = new Date().toISOString();
+    return await this.prisma.vote.update({ 
+      where: { id: report.id }, 
+      data: { ...data, updatedAt } 
+    });
   }
 
   async deleteVote(userId: number, reportId: number) {

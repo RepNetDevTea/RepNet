@@ -3,7 +3,7 @@ import { CreateUserDto } from './dtos/create-user.dto';
 import { UsersService } from './users.service';
 import { AccessJwtAuthGuard } from 'src/auth/guards/access-jwt-auth.guard';
 import type { Request } from 'express';
-import { classToPlain } from 'class-transformer';
+import { instanceToPlain } from 'class-transformer';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { UpdateUserAdminDto } from './dtos/update-user-admin.dto';
 
@@ -43,7 +43,7 @@ export class UsersController {
   @Get('me')
   @UseGuards(AccessJwtAuthGuard)
   async getUser(@Req() req: Request) {
-    const { id, userStatus } = classToPlain(req.user);
+    const { id, userStatus } = instanceToPlain(req.user);
     const user = await this.userService.findUserById(id);
     if (!user)
       throw new NotFoundException('The user was not found');
@@ -56,7 +56,7 @@ export class UsersController {
   @Patch('me')
   @UseGuards(AccessJwtAuthGuard)
   async updateUser(@Req() req: Request, @Body() body: UpdateUserDto) {
-    const { id } = classToPlain(req.user);
+    const { id } = instanceToPlain(req.user);
     const updatedUser = await this.userService.updateUserById(id, body);
     if (!updatedUser)
       throw new NotFoundException('The user was not found');
@@ -76,7 +76,7 @@ export class UsersController {
   @Delete('me')
   @UseGuards(AccessJwtAuthGuard)
   async deleteUser(@Req() req: Request) {
-    const { id } = classToPlain(req.user);
+    const { id } = instanceToPlain(req.user);
     const deletedUser = await this.userService.deleteUserById(id);
     if (!deletedUser)
       throw new NotFoundException('The user was not found');

@@ -7,7 +7,7 @@ import { ReportsService } from './reports.service';
 import { AccessJwtAuthGuard } from 'src/auth/guards/access-jwt-auth.guard';
 import type { Request } from 'express';
 import { CreateReportDto } from './dtos/create-report.dto';
-import { classToPlain } from 'class-transformer';
+import { instanceToPlain } from 'class-transformer';
 import { parse } from 'tldts';
 import { SitesService } from 'src/sites/sites.service';
 import { EvidencesService } from 'src/evidences/evidences.service';
@@ -31,7 +31,6 @@ export class ReportsController {
     private votesService: VotesService, 
     @Inject(s3Config.KEY) private s3Configuration: ConfigType<typeof s3Config>,
     private s3Service: S3Service, 
-    @Inject(bedrockConfig) private bedrockConfiguration: ConfigType<typeof bedrockConfig>, 
     private bedrockService: BedrockService, 
   ) {}
   
@@ -39,7 +38,7 @@ export class ReportsController {
   @UseGuards(AccessJwtAuthGuard)
   async createReport(@Req() req: Request, @Body() body: CreateReportDto) {
     const { tags, impacts, ...reportData} = body;
-    const userId = classToPlain(req.user).id;
+    const userId = instanceToPlain(req.user).id;
 
     const parsedUrl = parse(body.reportUrl.toLowerCase());
     const domain = parsedUrl.domain!;
@@ -180,12 +179,12 @@ export class ReportsController {
     @Param('reportId', new ParseIntPipe) reportId: number, 
     @Body() { voteType }: any
   ) {
-    const userId = classToPlain(req.user).id;
+    const userId = instanceToPlain(req.user).id;
 
     if (voteType !== 'downvote' && voteType !== 'upvote') {
       const deletedDownvote = await this.votesService.deleteVote(userId, reportId);
       if (!deletedDownvote)
-        throw new NotFoundException('The vote was not foun');
+        throw new NotFoundException('The vote was not found');
 
       return deletedDownvote;
     }

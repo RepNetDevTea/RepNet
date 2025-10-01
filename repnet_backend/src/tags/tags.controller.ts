@@ -2,7 +2,6 @@ import { Body, Controller, Delete, Get, NotFoundException, Param, ParseIntPipe, 
 import { CreateTagDto } from './dtos/create-tag.dto';
 import { TagsService } from './tags.service';
 import { UpdateTagDto } from './dtos/update-tag.dto';
-import { PutBucketNotificationConfigurationCommand } from '@aws-sdk/client-s3';
 
 @Controller('tags')
 export class TagsController {
@@ -10,12 +9,20 @@ export class TagsController {
   
   @Post()
   async createTag(@Body() body: CreateTagDto) {
-    return await this.tagsService.createTag(body);
+    const user = await this.tagsService.createTag(body);
+    if (!user)
+      throw new NotFoundException('The tag was not found');
+
+    return user;
   }
 
   @Get()
   async getAllTags() {
-    return await this.tagsService.getAllTags();
+    const tags = await this.tagsService.getAllTags();
+    if (!tags)
+      throw new NotFoundException('There are no tags');
+
+    return tags;
   }
 
   @Get(':tagId')
@@ -32,11 +39,19 @@ export class TagsController {
     @Param('tagId', new ParseIntPipe) tagId: number, 
     @Body() body: UpdateTagDto
   ) {
-    return await this.tagsService.updateTagById(tagId, body);
+    const updatedTag = await this.tagsService.updateTagById(tagId, body);
+    if (!updatedTag)
+      throw new NotFoundException('The tag was not found');
+
+    return updatedTag;
   }
 
   @Delete(':tagId')
   async deleteTag(@Param('tagId', new ParseIntPipe) tagId: number) {
-    return await this.tagsService.deleteTagById(tagId);
+    const deletedTag = await this.tagsService.deleteTagById(tagId);
+    if (!deletedTag)
+      throw new NotFoundException('The tag was not found');
+
+    return deletedTag;
   }  
 }

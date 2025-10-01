@@ -12,4 +12,8 @@ export class UpdateTagDto {
   @IsOptional()
   @IsInt()
   tagScore: number;
+
+  @IsOptional()
+  @IsInt()
+  tagDescription: string;
 }

@@ -12,4 +12,8 @@ export class CreateTagDto {
   @IsNotEmpty()
   @IsInt()
   tagScore: number;
+
+  @IsNotEmpty()
+  @IsInt()
+  tagDescription: string;
 }
