@@ -87,7 +87,7 @@ export default (context) => {
     messages: [{
       role: 'user',
       content: [
-        { type: 'text', text: promptInstructions },
+        { type: 'text', text: `${promptContext}\n${promptInstructions}` },
         ...evidenceUrls.map(({ evidenceUrls }) => ({
           type: 'image_url',
           image_url: { url: evidenceUrls }
