@@ -13,13 +13,24 @@ struct LoginRequest:Codable {
 }
 
 struct LoginResponse: Decodable {
-    let newUser: UserLoginWay
+    let user: UserLoginWay
     let accessToken: String
     let refreshToken: String
 }
-    
+
 struct UserLoginWay: Decodable {
     let id: Int
-    let userName, email, userRole , userStatus: String
+    let name: String
+    let fathersLastName: String
+    let mothersLastName: String
+    let username: String
+    let email: String
+    let hashedPassword: String
+    let hashedRefreshToken: String
+    let userStatus: String
+    let userRole: String
+    let updatedAt: String
+    let createdAt: String
 }
+
 
