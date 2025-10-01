@@ -12,9 +12,9 @@ struct UserRegistration: View {
     @State var registrationForm = UserRegistrationForm()
     @State var errorMessages: [String] = []
     func register() async{
-        do{
+        do{/*
             let response = try await authetnticationController.registerUser(name: registrationForm.nombre, email: registrationForm.correo, password: registrationForm.contraseña)
-            print("Usuario registrado: \(response)")
+            print("Usuario registrado: \(response)")*/
         }
         catch{
             print("Error al registrarte: \(error)")

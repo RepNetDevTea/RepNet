@@ -9,19 +9,23 @@ import Foundation
 
 struct RegistrationFormRequest:Codable {
     var name: String
+    var fatherLastName: String
+    var motherLastName: String
+    var userName: String
     var email: String
     var password: String
 }
 
 struct RegistrationFormResponse: Decodable {
-        let id: Int
-        let email, name, passwordHash, salt: String
-
-        enum CodingKeys: String, CodingKey {
-            case id, email, name
-            case passwordHash = "password_hash"
-            case salt
-        }
-    }
+    let newUser: UserRegistrationWay
+    let accesToken: String
+    let refreshToken: String
     
+        
+}
+    
+struct UserRegistrationWay: Decodable {
+    let id: Int
+    let name, fatherLastName, motherLastName, userName, email, hashedPassword, hashedRefreshToken,userStatus, userRole , updatedAt, createdAt: String
+}
 

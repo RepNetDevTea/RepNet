@@ -13,10 +13,13 @@ struct LoginRequest:Codable {
 }
 
 struct LoginResponse: Decodable {
-    let accessToken, refreshToken: String
-
-    enum CodingKeys: String, CodingKey {
-        case accessToken = "access_token"
-        case refreshToken = "refresh_token"
-    }
+    let newUser: UserLoginWay
+    let accessToken: String
+    let refreshToken: String
 }
+    
+struct UserLoginWay: Decodable {
+    let id: Int
+    let userName, email, userRole , userStatus: String
+}
+
