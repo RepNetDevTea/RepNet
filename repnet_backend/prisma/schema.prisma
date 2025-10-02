@@ -56,8 +56,9 @@ model Vote {
 model Evidence {
   id Int @default(autoincrement()) @id
   evidenceType String
-  evidenceFileUrl String
-  evidenceKey String
+  evidenceFileUrl String?
+  evidenceFileUri String?
+  evidenceKey String?
 
   report Report @relation(fields: [reportId], references: [id])
   reportId Int

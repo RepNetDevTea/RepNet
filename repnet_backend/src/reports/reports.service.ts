@@ -1,11 +1,13 @@
-import { Select } from '@chakra-ui/react';
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
+import { S3Service } from 'src/aws/s3.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class ReportsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService, 
+  ) {}
 
   async createReport(data: Prisma.ReportCreateInput) {
     return await this.prisma.report.create({ data });
@@ -27,7 +29,7 @@ export class ReportsService {
       where: { id: reportId },
       include: {
         votes: true, 
-        evidences: { select: { evidenceFileUrl: true } }, 
+        evidences: { select: { id: true, evidenceType: true,  evidenceKey: true , evidenceFileUrl: true, evidenceFileUri: true } }, 
         tags: { select: { tag: { select: { tagName: true, tagScore: true, tagDescription: true } } } }, 
         impacts: { select: { impact: { select: { impactName: true, impactScore: true, impactDescription: true } } } }, 
       } 
@@ -52,5 +54,13 @@ export class ReportsService {
       where: { id: report.id }, 
       data: { ...data, updatedAt }, 
     });  
+  }
+
+  async findEvidencesById(reportId: number) {
+    const report = await this.findReportById(reportId)
+    if (!report)
+      return null;
+
+    return report.evidences;
   }
 }

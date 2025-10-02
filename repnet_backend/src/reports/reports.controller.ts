@@ -19,7 +19,6 @@ import { UpdateReportDto } from './dtos/update-report.dto';
 import { VotesService } from 'src/votes/votes.service';
 import computeSeverityMetric from './utils/compute-severity-metric';
 import promptBuilder from './utils/promptBuilder';
-import bedrockConfig from 'src/aws/config/bedrock.config';
 import { BedrockService } from 'src/aws/bedrock.service';
 
 @Controller('reports')
@@ -67,32 +66,32 @@ export class ReportsController {
       new ParseFilePipe({ 
         validators: [
           new MaxFileSizeValidator({ maxSize: 25 * 1024 * 1024 }), 
-          new FileTypeValidator({ 
-            fileType: /^(image\/(png|jpeg|jpg))$/
-          })
+          new FileTypeValidator({ fileType: /^(image\/(png|jpeg|jpg))$/ })
         ] 
       })
     ) file: Express.Multer.File
   ) {
-    const { buffer, mimetype, originalname } = file;
-    await this.s3Service.upload(originalname, buffer);
+    const { buffer, mimetype } = file;
+    const fileExtension = mimetype.split('/')[1];
 
-    const bucketName = 'repnet-evidences-bucket';
-    const region = this.s3Configuration.region;
-    const key = originalname;
-    const evidenceFileUrl = `https://${bucketName}.s3.${region}.amazonaws.com/${encodeURIComponent(key)}`;
-
-    const data = {
-      evidenceType: mimetype, 
-      evidenceFileUrl, 
-      evidenceKey: key, 
-    };
+    const data = { evidenceType: fileExtension };
 
     const evidence = await this.evidencesService.createEvidence(reportId, data);
     if (!evidence)
       throw new HttpException('Something went wrong while creating the evidence', 500);
 
-    return evidence;
+    const evidenceKey = `${reportId}-${evidence.id}-${new Date().toISOString()}.${fileExtension}`;
+
+    await this.s3Service.upload(evidenceKey, buffer);
+
+    const evidenceFileUrl = this.s3Service.createFileUrl(evidenceKey);
+    const evidenceFileUri = this.s3Service.createFileUri(evidenceKey); 
+    
+    return await this.evidencesService.updateEvidenceById(evidence.id, { 
+      evidenceFileUrl, 
+      evidenceKey, 
+      evidenceFileUri, 
+    });
   }
 
   @Patch(':reportId/severityScore')
@@ -111,6 +110,27 @@ export class ReportsController {
     const impactsScore = computeSeverityMetric('impact', impacts);
     const realImpactScore = impactWeight * impactsScore;
 
+    const base64images = await Promise.all(
+      evidences.map(async ({ evidenceKey }) => {
+        const bytes = await this.s3Service.retrieve(evidenceKey as string)
+        return Buffer.from(bytes).toString('base64');
+      })
+    );
+
+    const evidenceFiles: object[] = [];
+
+    for (let i = 0; i < evidences.length; ++i) {
+      const { evidenceType } = evidences[i];
+      evidenceFiles.push({
+        type: 'image',
+        source: {
+          type: 'base64', 
+          media_type: `image/${evidenceType}`,
+          data: base64images[i], 
+        } 
+      })
+    }
+
     const context = {
       reportUrl, 
       tags,
@@ -118,13 +138,71 @@ export class ReportsController {
       impacts, 
       tagScoreData: { tagWeight, tagsScore, realTagScore, },
       impactScoreData: { impactWeight, impactsScore, realImpactScore, }, 
-      evidenceUrls: evidences.map(( evidence ) => evidence.evidenceFileUrl), 
+      evidenceFiles, 
     }
 
     const prompt = promptBuilder(context);
     const bedrockOutput = this.bedrockService.scoreEvidence(prompt); 
 
     return bedrockOutput;
+  }
+
+  @Get(':reportId/evidences')
+  async getEvidencesByReportId(@Param('reportId', new ParseIntPipe) reportId: number) {
+    const evidences = await this.reportsService.findEvidencesById(reportId);
+    if (evidences === null)
+      throw new NotFoundException('The report was not found');
+    else if (!evidences.length)
+      throw new HttpException('The report has no evidences attached to it', 400);
+
+    return evidences;
+  }
+
+  @Patch(':reportId/evidence/:evidenceId')
+  @UseInterceptors(FileInterceptor('file'))
+  async updateReportEvicenceByEvidenceId(
+    @Param('reportId', new ParseIntPipe) reportId: number, 
+    @Param('evidenceId', new ParseIntPipe) evidenceId: number, 
+    @UploadedFile(
+      new ParseFilePipe({ 
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 25 * 1024 *1024 }), 
+          new FileTypeValidator({ fileType: /^(image\/(png|jpeg|jpg))$/ })
+        ] 
+      })
+    ) 
+    file: Express.Multer.File
+  ) {
+    const report = await this.reportsService.findReportById(reportId);
+    if (!report)
+      throw new NotFoundException('The report was not found');
+    
+    const evidence = report.evidences.filter(({ id }) => id === evidenceId);
+    if (!evidence.length)
+      throw new NotFoundException('The evidence was not found');
+
+    const { buffer } = file;
+    const { id, evidenceKey } = evidence[0];
+
+    await this.s3Service.upload(evidenceKey!, buffer);
+    
+    return await this.evidencesService.updateEvidenceById(id, null);
+  }
+
+  @Delete(':reportId/evidence/:evidenceId')
+  async deleteReportEvidenceByEvidenceId(
+    @Param('reportId', new ParseIntPipe) reportId: number, 
+    @Param('evidenceId', new ParseIntPipe) evidenceId: number, 
+  ) {
+    const report = await this.reportsService.findReportById(reportId);
+    if (!report)
+      throw new NotFoundException('The report was not found');
+
+    const deletedEvidence = await this.evidencesService.deleteEvidenceById(evidenceId);
+    if (!deletedEvidence)
+      throw new NotFoundException('The evidence was not found');
+    
+    return deletedEvidence;
   }
 
   @Get()

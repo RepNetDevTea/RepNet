@@ -13,26 +13,16 @@ export default (context) => {
     impacts, 
     tagScoreData, 
     impactScoreData,
-    evidenceUrls, 
+    evidenceFiles, 
   } = context;
 
   const tagsSection = getMetricSection('tag', tags);
-
-  const {  
-    tagWeight, 
-    tagsScore,
-    realTagScore,     
-  } = tagScoreData;
-
   const impactsSection = getMetricSection('impact', impacts);
 
-  const { 
-    impactWeight, 
-    impactsScore,
-    realImpactScore, 
-  } = impactScoreData;
+  const { tagWeight, tagsScore, realTagScore, } = tagScoreData;
+  const { impactWeight, impactsScore, realImpactScore, } = impactScoreData;
 
-  return `
+  const inputText =  `
     Context Information:
 
     The user provided the following URL related to the incident:
@@ -75,12 +65,21 @@ export default (context) => {
     High (70): Strong, credible evidence showing direct malicious activity or high damage 
     potential (e.g., working phishing site, active malware sample, confirmed identity theft proof).
 
-    Evidence URL (retrieved from a AWS S3 bucket):
-    ${evidenceUrls.join('\n')}
-
     Final Task:
     Return only the evidence severity score (10, 40, or 70) according to your expert 
     judgment. Do not recalculate tags or impacts—they are already computed by the system. 
     Your assessment should focus strictly on the evidences provided.
   `;
+
+  return {
+    messages: [
+      {
+        role: 'user',
+        content: [
+          { type: 'text', text: inputText },
+          ...evidenceFiles
+        ]
+      }
+    ]
+  }
 }

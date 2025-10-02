@@ -16,25 +16,23 @@ export class BedrockService {
   }
 
   async scoreEvidence(prompt) {
-    const payload = {
-      messages: [
-        {
-          role: 'user',
-          content: prompt, 
-        }
-      ],
-      temperature: 0.3, 
-    };
 
-    const bedrockResponse = await this.bedrockClient.send(
-      new InvokeModelCommand({
-        modelId: 'arn:aws:bedrock:us-east-2:509399593375:inference-profile/us.mistral.pixtral-large-2502-v1:0', 
+    const payload = {
+        modelId: 'arn:aws:bedrock:us-east-2:509399593375:inference-profile/us.anthropic.claude-3-5-sonnet-20241022-v2:0', 
         contentType: 'application/json', 
         accept: 'application/json', 
-        body: JSON.stringify(payload), 
-      }) 
+        body: JSON.stringify({ 
+          anthropic_version: 'bedrock-2023-05-31', 
+          max_tokens: 1000, 
+          temperature: 0.3, 
+          ...prompt, 
+        }),
+    };
+
+    const response = await this.bedrockClient.send(
+      new InvokeModelCommand(payload) 
     )
 
-    return JSON.parse(new TextDecoder().decode(bedrockResponse.body));
+    return JSON.parse(new TextDecoder().decode(response.body));
   }
 }
