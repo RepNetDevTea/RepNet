@@ -32,7 +32,7 @@ export default (context) => {
     realImpactScore, 
   } = impactScoreData;
 
-  const promptContext = `
+  return `
     Context Information:
 
     The user provided the following URL related to the incident:
@@ -60,9 +60,7 @@ export default (context) => {
     A bonus factor was applied (+0.2) per additional tag or impact beyond the first.
 
     These scores represent the structured severity contribution of tags and impacts.
-  `
 
-  const promptInstructions = `
     Your Role – Evidence Severity:
 
     You are given the evidence files (images, screenshots, or other attachments) that 
@@ -77,24 +75,12 @@ export default (context) => {
     High (70): Strong, credible evidence showing direct malicious activity or high damage 
     potential (e.g., working phishing site, active malware sample, confirmed identity theft proof).
 
+    Evidence URL (retrieved from a AWS S3 bucket):
+    ${evidenceUrls.join('\n')}
+
     Final Task:
     Return only the evidence severity score (10, 40, or 70) according to your expert 
     judgment. Do not recalculate tags or impacts—they are already computed by the system. 
     Your assessment should focus strictly on the evidences provided.
   `;
-
-  const pixtralPrompt = {
-    messages: [{
-      role: 'user',
-      content: [
-        { type: 'text', text: `${promptContext}\n${promptInstructions}` },
-        ...evidenceUrls.map(({ evidenceUrls }) => ({
-          type: 'image_url',
-          image_url: { url: evidenceUrls }
-        })) 
-      ]
-    }] 
-  }
-
-  return pixtralPrompt;
 }

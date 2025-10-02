@@ -116,17 +116,9 @@ export class ReportsController {
       tags,
       reportDescription, 
       impacts, 
-      tagScoreData: {
-        tagWeight, 
-        tagsScore,
-        realTagScore, 
-      },
-      impactScoreData: {
-        impactWeight, 
-        impactsScore,
-        realImpactScore, 
-      }, 
-      evidenceUrls: evidences, 
+      tagScoreData: { tagWeight, tagsScore, realTagScore, },
+      impactScoreData: { impactWeight, impactsScore, realImpactScore, }, 
+      evidenceUrls: evidences.map(( evidence ) => evidence.evidenceFileUrl), 
     }
 
     const prompt = promptBuilder(context);

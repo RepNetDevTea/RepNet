@@ -102,7 +102,7 @@ model Report {
   id Int @default(autoincrement()) @id
   reportTitle String
   reportUrl String
-  reportDescription String
+  reportDescription String @db.VarChar(512)
   // report status available: approved, pending, rejected
   reportStatus String @default("pending")
   severity Int @default(0)

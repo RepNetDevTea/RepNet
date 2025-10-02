@@ -15,13 +15,23 @@ export class BedrockService {
     });
   }
 
-  async scoreEvidence(context) {
+  async scoreEvidence(prompt) {
+    const payload = {
+      messages: [
+        {
+          role: 'user',
+          content: prompt, 
+        }
+      ],
+      temperature: 0.3, 
+    };
+
     const bedrockResponse = await this.bedrockClient.send(
       new InvokeModelCommand({
-        modelId: 'mistral.pixtral-large-25.02', 
+        modelId: 'arn:aws:bedrock:us-east-2:509399593375:inference-profile/us.mistral.pixtral-large-2502-v1:0', 
         contentType: 'application/json', 
         accept: 'application/json', 
-        body: JSON.stringify(context), 
+        body: JSON.stringify(payload), 
       }) 
     )
 
