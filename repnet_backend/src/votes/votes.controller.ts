@@ -16,15 +16,6 @@ export class VotesController {
     return votes;
   }
 
-  @Get(':voteId')
-  async getVoteById(@Param('voteId', new ParseIntPipe) voteId: number) {
-    const vote = await this.votesService.findVoteById(voteId);
-    if (!vote)
-      throw new NotFoundException('The vote does not exist');
-
-    return vote;
-  } 
-  
   @Post()
   async createVote(@Body() body: CreateVoteAdminDto) {
     const { voteType, userId, reportId } = body;
@@ -40,6 +31,15 @@ export class VotesController {
 
     return newVote;
   }
+
+  @Get(':voteId')
+  async getVoteById(@Param('voteId', new ParseIntPipe) voteId: number) {
+    const vote = await this.votesService.findVoteById(voteId);
+    if (!vote)
+      throw new NotFoundException('The vote does not exist');
+
+    return vote;
+  } 
 
   @Patch(':voteId') 
   async updateVoteById(

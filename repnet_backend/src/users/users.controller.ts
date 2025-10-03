@@ -31,18 +31,11 @@ export class UsersController {
     return users;
   }
 
-  @Get(':userId')
-  async getUserById(@Param('userId', new ParseIntPipe) userId: number) {
-    const user = await this.userService.findUserById(userId);
-    if (!user)
-      throw new NotFoundException('The user was not found');
-    
-    return user;
-  }
-
   @Get('me')
   @UseGuards(AccessJwtAuthGuard)
   async getUser(@Req() req: Request) {
+    console.log('Get my own user, route handler');
+
     const { id, userStatus } = instanceToPlain(req.user);
     const user = await this.userService.findUserById(id);
     if (!user)
@@ -51,24 +44,15 @@ export class UsersController {
       throw new ForbiddenException('You have been either suspended or banned');
 
     return user;
-  }
-  
+  }  
+
   @Patch('me')
   @UseGuards(AccessJwtAuthGuard)
   async updateUser(@Req() req: Request, @Body() body: UpdateUserDto) {
     const { id } = instanceToPlain(req.user);
     const updatedUser = await this.userService.updateUserById(id, body);
     if (!updatedUser)
-      throw new NotFoundException('The user was not found');
-
-    return updatedUser;
-  }
-
-  @Patch(':userId')
-  async updateUserById(@Param('userId', new ParseIntPipe) userId: number, @Body() body: UpdateUserAdminDto) {
-    const updatedUser = await this.userService.updateUserById(userId, body);
-    if(!updatedUser)
-      throw new NotFoundException('The user was not found');
+      throw new HttpException('The user was not found or no data was provided', 400);
 
     return updatedUser;
   }
@@ -82,5 +66,23 @@ export class UsersController {
       throw new NotFoundException('The user was not found');
 
     return deletedUser;
+  }
+
+  @Get(':userId')
+  async getUserById(@Param('userId', new ParseIntPipe) userId: number) {
+    const user = await this.userService.findUserById(userId);
+    if (!user)
+      throw new NotFoundException('The user was not found');
+    
+    return user;
+  }
+
+  @Patch(':userId')
+  async updateUserById(@Param('userId', new ParseIntPipe) userId: number, @Body() body: UpdateUserAdminDto) {
+    const updatedUser = await this.userService.updateUserById(userId, body);
+    if(!updatedUser)
+      throw new NotFoundException('The user was not found');
+
+    return updatedUser;
   }
 }

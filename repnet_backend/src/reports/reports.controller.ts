@@ -58,40 +58,72 @@ export class ReportsController {
     return report;
   }
 
-  @Post(':reportId/evidences')
-  @UseInterceptors(FileInterceptor('file'))
-  async createEvidence(
+  @Get()
+  async getAllReports() {
+    const reports = await this.reportsService.getAllReports();
+    if (!reports)
+      throw new NotFoundException('There are no reports');
+
+    return reports;
+  }
+
+
+  @Get(':reportId')
+  async getReport(@Param('reportId', new ParseIntPipe) reportId: number) {
+    const report = await this.reportsService.findReportById(reportId);
+    if (!report)
+      throw new NotFoundException('The report was not found');
+
+    return report;
+  }
+
+  @Patch(':reportId')
+  async updateReport(@Param('reportId', new ParseIntPipe) reportId: number, @Body() body: UpdateReportDto) {
+    const { tags, impacts, ...attrsToUpdate } = body;
+    const updatedReport = await this.reportsService.updateReportById(reportId, attrsToUpdate);
+    if (!updatedReport)
+      throw new NotFoundException('The report was not found');
+
+    return updatedReport;
+  }
+
+  @Delete(':reportId')
+  async deleteReport(@Param('reportId', new ParseIntPipe) reportId: number) {
+    const deletedReport = await this.reportsService.deleteReportById(reportId);
+    if (!deletedReport)
+      throw new NotFoundException('The report was not found');
+
+    return deletedReport;
+  }
+
+  @Post(':reportId/toggleVote')
+  @UseGuards(AccessJwtAuthGuard)
+  async toggleDownvote(
+    @Req() req: Request, 
     @Param('reportId', new ParseIntPipe) reportId: number, 
-    @UploadedFile(
-      new ParseFilePipe({ 
-        validators: [
-          new MaxFileSizeValidator({ maxSize: 25 * 1024 * 1024 }), 
-          new FileTypeValidator({ fileType: /^(image\/(png|jpeg|jpg))$/ })
-        ] 
-      })
-    ) file: Express.Multer.File
+    @Body() { voteType }: any
   ) {
-    const { buffer, mimetype } = file;
-    const fileExtension = mimetype.split('/')[1];
+    const userId = instanceToPlain(req.user).id;
 
-    const data = { evidenceType: fileExtension };
+    if (voteType !== 'downvote' && voteType !== 'upvote') {
+      const deletedDownvote = await this.votesService.deleteVote(userId, reportId);
+      if (!deletedDownvote)
+        throw new NotFoundException('The vote was not found');
 
-    const evidence = await this.evidencesService.createEvidence(reportId, data);
-    if (!evidence)
-      throw new HttpException('Something went wrong while creating the evidence', 500);
+      return deletedDownvote;
+    }
 
-    const evidenceKey = `${reportId}-${evidence.id}-${new Date().toISOString()}.${fileExtension}`;
+    const data = {
+      voteType, 
+      user: { connect: { id: userId } }, 
+      report: { connect: { id: reportId } }, 
+    }
 
-    await this.s3Service.upload(evidenceKey, buffer);
+    const vote = await this.votesService.createVote(data);
+    if (!vote)
+      throw new HttpException('Something went wrong while storing upvote', 500);
 
-    const evidenceFileUrl = this.s3Service.createFileUrl(evidenceKey);
-    const evidenceFileUri = this.s3Service.createFileUri(evidenceKey); 
-    
-    return await this.evidencesService.updateEvidenceById(evidence.id, { 
-      evidenceFileUrl, 
-      evidenceKey, 
-      evidenceFileUri, 
-    });
+    return vote;
   }
 
   @Patch(':reportId/severityScore')
@@ -147,6 +179,42 @@ export class ReportsController {
     return bedrockOutput;
   }
 
+  @Post(':reportId/evidences')
+  @UseInterceptors(FileInterceptor('file'))
+  async createEvidence(
+    @Param('reportId', new ParseIntPipe) reportId: number, 
+    @UploadedFile(
+      new ParseFilePipe({ 
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 25 * 1024 * 1024 }), 
+          new FileTypeValidator({ fileType: /^(image\/(png|jpeg|jpg))$/ })
+        ] 
+      })
+    ) file: Express.Multer.File
+  ) {
+    const { buffer, mimetype } = file;
+    const fileExtension = mimetype.split('/')[1];
+
+    const data = { evidenceType: fileExtension };
+
+    const evidence = await this.evidencesService.createEvidence(reportId, data);
+    if (!evidence)
+      throw new HttpException('Something went wrong while creating the evidence', 500);
+
+    const evidenceKey = `${reportId}-${evidence.id}-${new Date().toISOString()}.${fileExtension}`;
+
+    await this.s3Service.upload(evidenceKey, buffer);
+
+    const evidenceFileUrl = this.s3Service.createFileUrl(evidenceKey);
+    const evidenceFileUri = this.s3Service.createFileUri(evidenceKey); 
+    
+    return await this.evidencesService.updateEvidenceById(evidence.id, { 
+      evidenceFileUrl, 
+      evidenceKey, 
+      evidenceFileUri, 
+    });
+  }
+
   @Get(':reportId/evidences')
   async getEvidencesByReportId(@Param('reportId', new ParseIntPipe) reportId: number) {
     const evidences = await this.reportsService.findEvidencesById(reportId);
@@ -158,7 +226,7 @@ export class ReportsController {
     return evidences;
   }
 
-  @Patch(':reportId/evidence/:evidenceId')
+  @Patch(':reportId/evidences/:evidenceId')
   @UseInterceptors(FileInterceptor('file'))
   async updateReportEvicenceByEvidenceId(
     @Param('reportId', new ParseIntPipe) reportId: number, 
@@ -189,7 +257,7 @@ export class ReportsController {
     return await this.evidencesService.updateEvidenceById(id, null);
   }
 
-  @Delete(':reportId/evidence/:evidenceId')
+  @Delete(':reportId/evidences/:evidenceId')
   async deleteReportEvidenceByEvidenceId(
     @Param('reportId', new ParseIntPipe) reportId: number, 
     @Param('evidenceId', new ParseIntPipe) evidenceId: number, 
@@ -203,72 +271,5 @@ export class ReportsController {
       throw new NotFoundException('The evidence was not found');
     
     return deletedEvidence;
-  }
-
-  @Get()
-  async getAllReports() {
-    const reports = await this.reportsService.getAllReports();
-    if (!reports)
-      throw new NotFoundException('There are no reports');
-
-    return reports;
-  }
-
-  @Get(':reportId')
-  async getReport(@Param('reportId', new ParseIntPipe) reportId: number) {
-    const report = await this.reportsService.findReportById(reportId);
-    if (!report)
-      throw new NotFoundException('The report was not found');
-
-    return report;
-  }
-
-  @Patch(':reportId')
-  async updateReport(@Param('reportId', new ParseIntPipe) reportId: number, @Body() body: UpdateReportDto) {
-    const { tags, impacts, ...attrsToUpdate } = body;
-    const updatedReport = await this.reportsService.updateReportById(reportId, attrsToUpdate);
-    if (!updatedReport)
-      throw new NotFoundException('The report was not found');
-
-    return updatedReport;
-  }
-
-  @Delete(':reportId')
-  async deleteReport(@Param('reportId', new ParseIntPipe) reportId: number) {
-    const deletedReport = await this.reportsService.deleteReportById(reportId);
-    if (!deletedReport)
-      throw new NotFoundException('The report was not found');
-
-    return deletedReport;
-  }
-  
-  @Post(':reportId/toggleVote')
-  @UseGuards(AccessJwtAuthGuard)
-  async toggleDownvote(
-    @Req() req: Request, 
-    @Param('reportId', new ParseIntPipe) reportId: number, 
-    @Body() { voteType }: any
-  ) {
-    const userId = instanceToPlain(req.user).id;
-
-    if (voteType !== 'downvote' && voteType !== 'upvote') {
-      const deletedDownvote = await this.votesService.deleteVote(userId, reportId);
-      if (!deletedDownvote)
-        throw new NotFoundException('The vote was not found');
-
-      return deletedDownvote;
-    }
-
-    const data = {
-      voteType, 
-      user: { connect: { id: userId } }, 
-      report: { connect: { id: reportId } }, 
-    }
-
-    const vote = await this.votesService.createVote(data);
-    if (!vote)
-      throw new HttpException('Something went wrong while storing upvote', 500);
-
-    return vote;
   }
 }

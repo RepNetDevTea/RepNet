@@ -56,7 +56,7 @@ export class UsersService {
 
   async updateUserById(userId: number, data: Prisma.UserUpdateInput) {
     const user = await this.findUserById(userId);
-    if (!user)
+    if (!user || !data)
       return null;
 
     if ('hashedPassword' in data)
