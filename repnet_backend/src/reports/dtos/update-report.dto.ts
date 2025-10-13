@@ -14,7 +14,7 @@ export class UpdateReportDto {
   reportTitle: string; 
 
   @IsOptional()
-  @Transform(({ value }) => value.trim())
+  @Transform(({ value }) => typeof value === 'string' ? value.trim(): value)
   @IsUrl()
   reportUrl: string;
 

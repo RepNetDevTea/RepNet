@@ -78,16 +78,16 @@ export class ReportsService {
 
   async createReport(
     data: Prisma.ReportCreateInput, 
-    tags: Prisma.TagWhereUniqueInput[], 
-    impacts: Prisma.ImpactWhereUniqueInput[],  
+    tags: Prisma.TagWhereUniqueInput[] | undefined, 
+    impacts: Prisma.ImpactWhereUniqueInput[] | undefined,  
   ) {
     const report = await this.prisma.report.create({ data });
     const reportId = report.id;
 
-    if (tags.length)
+    if (tags !== undefined && tags.length)
       await this.createReportTags(reportId, tags);
 
-    if (impacts.length)
+    if (impacts !== undefined && impacts.length)
       await this.createReportImpacts(reportId, impacts);
 
     return report;
@@ -129,25 +129,25 @@ export class ReportsService {
   async updateReportById(
     reportId: number, 
     data: Prisma.ReportUpdateInput, 
-    addedTags: Prisma.TagWhereUniqueInput[],
-    deletedTags: Prisma.TagWhereUniqueInput[],
-    addedImpacts: Prisma.ImpactWhereUniqueInput[],
-    deletedImpacts: Prisma.ImpactWhereUniqueInput[],
+    addedTags: Prisma.TagWhereUniqueInput[] | undefined,
+    deletedTags: Prisma.TagWhereUniqueInput[] | undefined,
+    addedImpacts: Prisma.ImpactWhereUniqueInput[] | undefined,
+    deletedImpacts: Prisma.ImpactWhereUniqueInput[] | undefined,
   ) {
     const report = await this.findReportById(reportId);
     if (!report)
       return null;
 
-    if (addedTags.length)
+    if (addedTags !== undefined && addedTags.length)
       await this.createReportTags(report.id, addedTags);
 
-    if (deletedTags.length)
+    if (deletedTags !== undefined && deletedTags.length)
       await this.deleteReportTags(report.id, deletedTags);
 
-    if (addedImpacts.length)
+    if (addedImpacts !== undefined && addedImpacts.length)
       await this.createReportImpacts(report.id, addedImpacts);
 
-    if (deletedImpacts.length)
+    if (deletedImpacts !== undefined && deletedImpacts.length)
       await this.deleteReportImpacts(report.id, deletedImpacts);
 
     const updatedAt = new Date().toISOString();

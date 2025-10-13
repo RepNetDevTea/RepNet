@@ -88,7 +88,7 @@ export class ReportsController {
     } = body;
 
     const updatedReport = await this.reportsService.updateReportById(
-      reportId, reportAttrsToUpdate, addedImpacts, deletedImpacts, addedTags, deletedTags);
+      reportId, reportAttrsToUpdate, addedTags, deletedTags, addedImpacts, deletedImpacts);
 
     if (!updatedReport)
       throw new NotFoundException('The report was not found');
