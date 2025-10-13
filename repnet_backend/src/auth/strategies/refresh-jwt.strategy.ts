@@ -10,8 +10,8 @@ import { AuthService } from "../auth.service";
 export class RefreshJwtAuthStrategy extends PassportStrategy(Strategy, 'refresh-jwt') {
   constructor(
     @Inject(refreshJwtConfig.KEY)
-    private refreshJwtConfiguration: ConfigType<typeof refreshJwtConfig>, 
-    private authService: AuthService, 
+    private readonly refreshJwtConfiguration: ConfigType<typeof refreshJwtConfig>, 
+    private readonly authService: AuthService, 
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),

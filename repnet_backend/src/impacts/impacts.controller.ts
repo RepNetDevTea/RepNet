@@ -5,7 +5,7 @@ import { UpdateImpactDto } from './dtos/update-impact.dto';
 
 @Controller('impacts')
 export class ImpactsController {
-  constructor(private impactsService: ImpactsService) {}
+  constructor(private readonly impactsService: ImpactsService) {}
   
   @Post()
   async createImpact(@Body() body: CreateImpactDto) {

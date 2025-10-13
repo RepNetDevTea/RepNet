@@ -12,9 +12,9 @@ const scrypt = promisify(_scrypt);
 @Injectable()
 export class AuthService {
   constructor(
-    private prisma: PrismaService, 
-    private jwtService: JwtService, 
-    @Inject(refreshJwtConfig.KEY) private refreshJwtConfiguration: ConfigType<typeof refreshJwtConfig>, 
+    private readonly prisma: PrismaService, 
+    private readonly jwtService: JwtService, 
+    @Inject(refreshJwtConfig.KEY) private readonly refreshJwtConfiguration: ConfigType<typeof refreshJwtConfig>, 
   ) {}
   
   async generateTokens(userId: number, payload: object) {

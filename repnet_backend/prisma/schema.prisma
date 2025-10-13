@@ -107,6 +107,7 @@ model Report {
   // report status available: approved, pending, rejected
   reportStatus String @default("pending")
   severity Int @default(0)
+  adminFeedback String @default("")
   votes Vote[]
   evidences Evidence[]
   tags ReportTags[]

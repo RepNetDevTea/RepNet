@@ -4,12 +4,23 @@ import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class SitesService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   async findSite(filter: Prisma.SiteWhereUniqueInput) {
     return await this.prisma.site.findUnique({ 
       where: filter, 
-      include: { reports: true } 
+      include: { 
+        reports: { 
+          include: { 
+            impacts: { 
+              select: { impact: { select: { impactName: true } } } 
+            }, 
+            tags: { 
+              select: { tag: { select: { tagName: true } } } 
+            }
+          }, 
+        }, 
+      }
     });
   }
 

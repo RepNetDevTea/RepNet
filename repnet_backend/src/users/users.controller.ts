@@ -10,7 +10,7 @@ import { UpdateUserAdminDto } from './dtos/update-user-admin.dto';
 @Controller('users')
 export class UsersController {
   constructor(
-    private userService: UsersService, 
+    private readonly userService: UsersService, 
   ) {}
 
   @Post()
@@ -34,8 +34,6 @@ export class UsersController {
   @Get('me')
   @UseGuards(AccessJwtAuthGuard)
   async getUser(@Req() req: Request) {
-    console.log('Get my own user, route handler');
-
     const { id, userStatus } = instanceToPlain(req.user);
     const user = await this.userService.findUserById(id);
     if (!user)

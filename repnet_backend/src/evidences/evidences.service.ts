@@ -6,8 +6,8 @@ import { PrismaService } from 'src/prisma/prisma.service';
 @Injectable()
 export class EvidencesService {
   constructor(
-    private prisma: PrismaService, 
-    private s3Service: S3Service, 
+    private readonly prisma: PrismaService, 
+    private readonly s3Service: S3Service, 
   ) {}
 
   async createEvidence(reportId: number, data: Prisma.EvidenceCreateWithoutReportInput) {

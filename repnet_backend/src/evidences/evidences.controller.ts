@@ -3,7 +3,7 @@ import { EvidencesService } from './evidences.service';
 
 @Controller('evidences')
 export class EvidencesController {
-  constructor(private evidencesService: EvidencesService) {}
+  constructor(private readonly evidencesService: EvidencesService) {}
 
   @Get()
   async getEvidences() {

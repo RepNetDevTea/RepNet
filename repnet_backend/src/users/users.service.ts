@@ -11,8 +11,8 @@ const scrypt = promisify(_scrypt);
 @Injectable()
 export class UsersService {
   constructor(
-    private prisma: PrismaService, 
-    private authService: AuthService, 
+    private readonly prisma: PrismaService, 
+    private readonly authService: AuthService, 
   ) {}
   
   async hashPassword(password: string) {

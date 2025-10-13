@@ -8,7 +8,7 @@ import type { ConfigType } from "@nestjs/config";
 export class AccessJwtAuthStrategy extends PassportStrategy(Strategy) {
   constructor(
     @Inject(accessJwtConfig.KEY) 
-    private accessJwtConfiguration: ConfigType<typeof accessJwtConfig>
+    private readonly accessJwtConfiguration: ConfigType<typeof accessJwtConfig>
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),

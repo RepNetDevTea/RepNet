@@ -4,7 +4,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class TagsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   async findTagByFilter(filter: Prisma.TagWhereUniqueInput) {
     return await this.prisma.tag.findUnique({ 

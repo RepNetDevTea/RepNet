@@ -1,11 +1,11 @@
-import { Body, Controller, Delete, Get, HttpException, NotFoundException, Param, ParseIntPipe, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpException, NotFoundException, Param, ParseIntPipe, Patch, Post, Query } from '@nestjs/common';
 import { SitesService } from './sites.service';
 import { CreateSiteDto } from './dtos/create-site.dto';
 import { UpdateSiteDto } from './dtos/update-site.dto';
 
 @Controller('sites')
 export class SitesController {
-  constructor(private sitesService: SitesService) {}
+  constructor(private readonly sitesService: SitesService) {}
 
   @Post()
   async createSite(@Body() body: CreateSiteDto) {
@@ -17,21 +17,40 @@ export class SitesController {
   }
 
   @Get()
-  async getAllSites() {
+  async getSites(@Query('siteDomain') siteDomain?: string) {
+    if (siteDomain) {
+      const site = await this.sitesService.findSite({ siteDomain });
+      if (!site)
+        throw new NotFoundException('The site was not found');
+
+      const { createdAt, ...reamingData } = site;
+      return {
+        ...reamingData,
+        createdAt: createdAt.toLocaleString('es-MX'), 
+      };
+    }
+    
     const sites = await this.sitesService.getAllSites();
-    if(sites)
+    if (!sites.length)
       throw new HttpException('There are no sites', 400);
 
-    return sites;
+    return sites.map(({createdAt, ...remainingData}) => ({ 
+      ...remainingData, 
+      createdAt: createdAt.toLocaleString('es-MX') 
+    }));
   }
 
   @Get(':siteId')
-  async getSiteById(@Param('sitId', new ParseIntPipe) siteId: number) {
+  async getSiteById(@Param('siteId', new ParseIntPipe) siteId: number) {
     const site = await this.sitesService.findSite({ id: siteId });
     if (!site)
       throw new NotFoundException('The site was not found');
 
-    return site;
+    const {createdAt, ...remainingSiteData} = site;
+    return { 
+      ...remainingSiteData, 
+      createdAt: createdAt.toLocaleString('es-MX'), 
+    };
   }
 
   @Patch(':siteId')

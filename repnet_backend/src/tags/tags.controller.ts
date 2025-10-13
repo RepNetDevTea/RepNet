@@ -5,7 +5,7 @@ import { UpdateTagDto } from './dtos/update-tag.dto';
 
 @Controller('tags')
 export class TagsController {
-  constructor(private tagsService: TagsService) {}
+  constructor(private readonly tagsService: TagsService) {}
   
   @Post()
   async createTag(@Body() body: CreateTagDto) {

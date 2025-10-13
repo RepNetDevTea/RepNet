@@ -24,13 +24,13 @@ import { BedrockService } from 'src/aws/bedrock.service';
 @Controller('reports')
 export class ReportsController {
   constructor(
-    private reportsService: ReportsService, 
-    private evidencesService: EvidencesService, 
-    private sitesService: SitesService,
-    private votesService: VotesService, 
-    @Inject(s3Config.KEY) private s3Configuration: ConfigType<typeof s3Config>,
-    private s3Service: S3Service, 
-    private bedrockService: BedrockService, 
+    private readonly reportsService: ReportsService, 
+    private readonly evidencesService: EvidencesService, 
+    private readonly sitesService: SitesService,
+    private readonly votesService: VotesService, 
+    @Inject(s3Config.KEY) private readonly s3Configuration: ConfigType<typeof s3Config>,
+    private readonly s3Service: S3Service, 
+    private readonly bedrockService: BedrockService, 
   ) {}
   
   @Post()
@@ -51,7 +51,7 @@ export class ReportsController {
       site: { connect: { id: site.id } }, 
     }
   
-    const report = await this.reportsService.createReport(data);
+    const report = await this.reportsService.createReport(data, tags, impacts);
     if (!report)
       throw new HttpException('Something went wrong while creating the report', 500);
 
@@ -79,8 +79,17 @@ export class ReportsController {
 
   @Patch(':reportId')
   async updateReport(@Param('reportId', new ParseIntPipe) reportId: number, @Body() body: UpdateReportDto) {
-    const { tags, impacts, ...attrsToUpdate } = body;
-    const updatedReport = await this.reportsService.updateReportById(reportId, attrsToUpdate);
+    const { 
+      addedTags, 
+      deletedTags, 
+      deletedImpacts, 
+      addedImpacts, 
+      ...reportAttrsToUpdate 
+    } = body;
+
+    const updatedReport = await this.reportsService.updateReportById(
+      reportId, reportAttrsToUpdate, addedImpacts, deletedImpacts, addedTags, deletedTags);
+
     if (!updatedReport)
       throw new NotFoundException('The report was not found');
 
