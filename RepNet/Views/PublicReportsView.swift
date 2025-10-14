@@ -8,58 +8,80 @@
 
 import SwiftUI
 
-struct PublicReportsView: View {
+// esta es la vista para la pestana "reportes publicos".
+// es una version mas simple que `myreportsview`, ya que no tiene filtros,
+// solo muestra una lista de reportes ordenada por fecha.
 
-    // CAMBIO 1 (Confirmación): Se mantiene el @StateObject, pero ahora es para nuestro nuevo ViewModel.
-    // Esto es correcto, ya que esta vista ahora tiene su propia lógica independiente.
-    @StateObject private var viewModel = PublicReportsViewModel()
+// -- componentes utilizados --
+// - reportcardcomponent
+struct PublicReportsView: View {
+    
+    // `@observedobject` indica que la vista recibe el viewmodel de un padre (`maintabview`).
+    // esto conserva el estado de la lista al cambiar de pestana.
+    @ObservedObject var viewModel: PublicReportsViewModel
     
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
-                
-                headerView
-                
-                // CAMBIO 2 (AÑADIDO): Se ha añadido el SegmentedPickerComponent.
-                // Este componente ahora toma las opciones ["Todos", "Trending"] del `PublicReportsViewModel`
-                // y vincula la selección a la variable `selectedFilter` del mismo ViewModel.
-                SegmentedPickerComponent(options: viewModel.filterOptions, selectedOption: $viewModel.selectedFilter)
-                
-                // CAMBIO 3 (ELIMINADO): Se ha eliminado toda la HStack que contenía los dos FilterButtonComponent.
-                // Como esta pantalla solo necesita los filtros "Todos" y "Trending", los menús
-                // desplegables para categoría y orden ya no son necesarios aquí.
-                
-                ForEach(viewModel.filteredReports) { report in
-                    NavigationLink(destination: Text("Detalle del reporte público: \(report.title)")) {
-                        ReportCardComponent(report: report)
+        // se usa un `navigationview` para poder navegar a la pantalla de detalle de cada reporte.
+        NavigationView {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 20) {
+                    headerView
+                    
+                    // --- logica de contenido principal ---
+                    // este bloque `if/else` maneja los 4 posibles estados de la vista.
+                    if viewModel.isLoading {
+                        // 1. estado de carga: muestra un spinner.
+                        ProgressView().frame(maxWidth: .infinity)
+                    } else if let errorMessage = viewModel.errorMessage {
+                        // 2. estado de error: muestra el mensaje de error.
+                        Text(errorMessage).foregroundColor(.red).padding()
+                    } else if viewModel.reports.isEmpty {
+                        // 3. estado vacio: la carga fue exitosa pero no habia reportes.
+                        Text("no hay reportes publicos disponibles en este momento.")
+                            .foregroundColor(.textSecondary)
+                            .frame(maxWidth: .infinity, alignment: .center)
+                            .padding()
+                    } else {
+                        // 4. estado de exito: muestra la lista de reportes.
+                        ForEach(viewModel.reports) { report in
+                            NavigationLink(destination: ReportDetailView(report: report)) {
+                                ReportCardComponent(report: report)
+                            }
+                        }
+                    }
+                }
+                .padding()
+            }
+            .background(Color.appBackground)
+            .navigationBarHidden(true)
+            .onAppear {
+                // se carga la data inicial solo si la lista de reportes esta vacia,
+                // para no recargarla cada vez que se entra a la pestana.
+                if viewModel.reports.isEmpty {
+                    Task {
+                        await viewModel.fetchPublicReports()
                     }
                 }
             }
-            .padding()
         }
-        .background(Color.appBackground)
-        .navigationBarHidden(true)
     }
     
-    // CAMBIO 4 (Estilístico): He simplificado el header para que sea más directo,
-    // eliminando el subtítulo y haciendo el título principal más prominente.
+    // -- vistas auxiliares --
+    
+    // una vista calculada para el encabezado, solo muestra el titulo de la pantalla.
     private var headerView: some View {
         HStack {
-            VStack(alignment: .leading) {
-                Text("Reportes Públicos")
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
-            }
+            Text("reportes publicos").font(.largeTitle).fontWeight(.bold)
             Spacer()
         }
     }
 }
 
-// La vista previa se mantiene igual, ya que no depende de la lógica interna.
+// mark: - preview
+
 struct PublicReportsView_Previews: PreviewProvider {
     static var previews: some View {
-        NavigationView {
-            PublicReportsView()
-        }
+        // para la vista previa, creamos una nueva instancia del viewmodel.
+        PublicReportsView(viewModel: PublicReportsViewModel())
     }
 }

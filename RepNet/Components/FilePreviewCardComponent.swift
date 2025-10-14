@@ -4,25 +4,29 @@
 //
 //  Created by Angel Bosquez on 30/09/25.
 //
+//tarjeta para vista previa de archivos, primero pensada para imagenes y documentos
+//ahora solo es para documentos
 
 
 import SwiftUI
 
 struct FilePreviewCardComponent: View {
+    //objeto con datos de archivo a mostrar
     let file: FilePreview
-    let onDelete: () -> Void // Acción para eliminar
+    //accion para eliminar archivo
+    let onDelete: () -> Void
 
     var body: some View {
         ZStack(alignment: .topTrailing) {
             if let image = file.image {
-                // Vista previa para imágenes
+                // se comprueba si el archivo es imagen
                 Image(uiImage: image)
                     .resizable()
                     .scaledToFill()
                     .frame(width: 100, height: 100)
                     .clipShape(RoundedRectangle(cornerRadius: 12))
             } else {
-                // Vista previa para otros documentos
+                // vista para documentos (no se usara)
                 VStack(spacing: 8) {
                     Image(systemName: file.iconName)
                         .font(.largeTitle)
@@ -37,7 +41,7 @@ struct FilePreviewCardComponent: View {
                 .cornerRadius(12)
             }
             
-            // Botón de eliminar
+            //boton de borrado
             Button(action: onDelete) {
                 Image(systemName: "xmark.circle.fill")
                     .foregroundColor(.white)

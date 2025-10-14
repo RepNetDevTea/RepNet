@@ -8,41 +8,41 @@
 
 import Foundation
 
-/// Un servicio dedicado exclusivamente a las llamadas de red relacionadas con el perfil del usuario.
+// este archivo define el `userapiservice`, un servicio para todas las
+// llamadas a la api que tienen que ver con el perfil del usuario.
+
+// agrupa las funciones para obtener y actualizar el perfil de usuario.
+// usa el `networkclient` generico para las peticiones.
 struct UserAPIService {
     
     private let networkClient = NetworkClient()
     
-    /// Recupera el perfil del usuario que ha iniciado sesión.
+    // recupera los datos del perfil del usuario que ha iniciado sesion.
+    // es una peticion autenticada (`isauthenticated: true`), por lo que envia el token.
+    // se asume que existe un `userprofileresponsedto` para decodificar la respuesta.
     func fetchUserProfile() async throws -> UserProfileResponseDTO {
         return try await networkClient.request(
             endpoint: AppConfig.userProfileURL,
             method: "GET",
-            // Le decimos al NetworkClient que esta es una petición protegida
-            // y que debe adjuntar el accessToken.
             isAuthenticated: true
         )
     }
     
-    // --- NUEVA FUNCIÓN AÑADIDA ---
-    
-    /// Envía los datos actualizados del perfil del usuario al backend.
-    /// - Parameter data: Un DTO que contiene los campos a actualizar y la contraseña actual para autorización.
+    // envia los datos actualizados del perfil al backend.
+    // `data` es el dto con los nuevos datos y la contrasena de confirmacion.
     func updateUserProfile(data: UpdateProfileRequestDTO) async throws {
-        // Usamos el método "PATCH" que es ideal para actualizaciones parciales,
-        // pero "PUT" también es común. ¡Confirma cuál usa tu backend!
+        // se usa el metodo "patch", que es para actualizaciones parciales.
+        // a veces los backends usan "put". es importante confirmar cual se usa.
         try await networkClient.request(
             endpoint: AppConfig.userProfileURL,
             method: "PATCH",
-
-            // Pasamos el DTO con los datos del formulario como el cuerpo de la petición.
+            // el `dto` con los datos del formulario se envia como el cuerpo de la peticion.
             body: data,
-            
-            // Esta también es una petición protegida que requiere el token.
+            // esta tambien es una operacion que requiere que el usuario este logueado.
             isAuthenticated: true
         )
     }
     
-    // En el futuro, podríamos añadir la función para borrar la cuenta.
-    // func deleteUser(password: String) async throws { ... }
+    // aqui se podria anadir en el futuro la funcion para borrar la cuenta.
+    // func deleteuser(password: string) async throws { ... }
 }

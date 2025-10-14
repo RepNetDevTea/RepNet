@@ -5,6 +5,10 @@
 //  Created by Angel Bosquez on 30/09/25.
 //
 
+// este es un modelo para la ui que representa un archivo seleccionado por el usuario.
+// su trabajo es tomar la url de un archivo y prepararlo para ser mostrado en una vista previa,
+// ya sea como una imagen o como un icono generico.
+// `identifiable` es para poder usarlo en listas de swiftui.
 
 import SwiftUI
 import UniformTypeIdentifiers

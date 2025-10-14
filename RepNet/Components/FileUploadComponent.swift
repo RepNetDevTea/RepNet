@@ -3,14 +3,19 @@
 //  RepNet
 //
 //  Created by Angel Bosquez on 29/09/25.
-//esta madre esta mal hecha y es 100% ai, pequeno detalle que no hay hover en movil 
+//esta madre esta mal hecha y es 100% ai, pequeno detalle que no hay hover en movil
+//componente para seleccionar varios archivos
+/// una vez seleccionados, muestra una vista previa horizontal de los archivos,
+/// permitiendo al usuario eliminar cualquiera de ellos.
 
 import SwiftUI
 import UniformTypeIdentifiers
 
 struct FileUploadComponent: View {
     
+    //binding de filepreview
     @State private var selectedFiles: [FilePreview] = []
+    //tipos de archivos que se permiten 
     @State private var showFileImporter = false
 
     var body: some View {

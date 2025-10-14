@@ -8,17 +8,23 @@
 
 import SwiftUI
 
+// un componente de "tag" o "etiqueta" inteligente.
+// su color de fondo y de texto cambian automaticamente segun el contenido del texto.
+// esto permite mantener un estilo consistente para valores especificos en toda la app
+// (ej. severidades, categorias, etc.).
 struct TagComponent: View {
+    
+    // el texto que se muestra en el tag y que tambien determina su estilo.
     let text: String
     
-    // Propiedades privadas para guardar el estilo
+    // propiedades privadas para guardar el estilo, determinadas en el `init`.
     private let backgroundColor: Color
     private let textColor: Color
 
-    // El inicializador ahora es mucho más simple. Solo necesita el texto.
+    // el inicializador solo necesita el texto.
+    // la logica para elegir los colores se delega a la funcion `getstyle`.
     init(text: String) {
         self.text = text
-        // Llama a nuestra función auxiliar para determinar los colores correctos.
         let style = Self.getStyle(for: text)
         self.backgroundColor = style.backgroundColor
         self.textColor = style.textColor
@@ -35,52 +41,53 @@ struct TagComponent: View {
             .cornerRadius(20)
     }
     
-    // --- LÓGICA DE ESTILO CENTRALIZADA ---
-    // Esta función estática actúa como un "diccionario de estilos".
-    // Le das un texto y te devuelve los colores correctos desde Theme.swift.
+    // actua como un diccionario de estilos: recibe un texto y devuelve los colores correctos.
+    // esto centraliza toda la logica de estilo en un solo lugar para facil mantenimiento.
+    // se asume que los colores (ej. `.severitysevere`) estan definidos en un `theme`.
     private static func getStyle(for text: String) -> (backgroundColor: Color, textColor: Color) {
         switch text {
-        // Severidades
-        case "Severa": return (.severitySevere, .severitySevereText)
-        case "Alta", "High": return (.severityHigh, .severityHighText)
-        case "Media", "Medium": return (.severityMedium, .severityMediumText)
-        case "Baja", "Low": return (.severityLow, .severityLowText)
+        // severidades
+        case "severa": return (.severitySevere, .severitySevereText)
+        case "alta", "high": return (.severityHigh, .severityHighText)
+        case "media", "medium": return (.severityMedium, .severityMediumText)
+        case "baja", "low": return (.severityLow, .severityLowText)
             
-        // Categorías
-        case "Phishing": return (.categoryPhishing, .categoryPhishingText)
-        case "Malware": return (.categoryMalware, .categoryMalwareText)
-        case "Fraude": return (.categoryFraud, .categoryFraudText)
-        case "Spam": return (.categorySpam, .categorySpamText)
-        case "Violación de privacidad": return (.categoryPrivacy, .categoryPrivacyText)
-        case "Falsificación/Propiedad intelectual": return (.categoryIP, .categoryIPText)
+        // categorias
+        case "phishing": return (.categoryPhishing, .categoryPhishingText)
+        case "malware": return (.categoryMalware, .categoryMalwareText)
+        case "fraude": return (.categoryFraud, .categoryFraudText)
+        case "spam": return (.categorySpam, .categorySpamText)
+        case "violacion de privacidad": return (.categoryPrivacy, .categoryPrivacyText)
+        case "falsificacion/propiedad intelectual": return (.categoryIP, .categoryIPText)
             
-        // --- NUEVOS CASOS PARA IMPACTOS ---
-        case "Robo de credenciales", "Robo de identidad":
+        // impactos
+        case "robo de credenciales", "robo de identidad":
             return (.impactIdentity, .impactIdentityText)
-        case "Pérdida financiera":
+        case "perdida financiera":
             return (.impactFinancial, .impactFinancialText)
-        case "Pérdida de la privacidad":
+        case "perdida de la privacidad":
             return (.impactPrivacy, .impactPrivacyText)
-        case "Infección de malware":
+        case "infeccion de malware":
             return (.impactMalware, .impactMalwareText)
-        case "Riesgo legal":
+        case "riesgo legal":
             return (.impactLegal, .impactLegalText)
             
-        // Default para cualquier otro texto
+        // valor por defecto para cualquier otro texto que no coincida.
         default: return (.impactDefault, .impactDefaultText)
         }
     }
 }
 
-// La vista previa ahora usa el nuevo inicializador simple. ¡Mucho más limpio!
-// He añadido un impacto a la vista previa para que puedas verlo.
+//preview ia
+
 struct TagComponent_Previews: PreviewProvider {
     static var previews: some View {
         VStack(spacing: 10) {
-            TagComponent(text: "Severa")
-            TagComponent(text: "Malware")
-            TagComponent(text: "Fraude")
-            TagComponent(text: "Pérdida financiera") // Nuevo ejemplo
+            TagComponent(text: "severa")
+            TagComponent(text: "malware")
+            TagComponent(text: "fraude")
+            TagComponent(text: "perdida financiera")
+            TagComponent(text: "otro texto") // ejemplo del caso por defecto.
         }
         .padding()
     }

@@ -8,33 +8,44 @@
 
 import SwiftUI
 
+// esta es la vista de swiftui para la pantalla de "login".
+// son manejados por el `loginviewmodel`.
+
+// -- componentes utilizados --
+// - inputviewcomponent
+// - secureinputviewcomponent
+// - primarybuttoncomponent
 struct LoginView: View {
     
+    // se crea e inicializa el viewmodel para esta vista.
     @StateObject private var viewModel = LoginViewModel()
     
-    // Inyectamos el AuthenticationManager desde el entorno para poder
-    // pasárselo a la función de login.
+    // se inyecta el `authmanager` del entorno. se le pasara al viewmodel
+    // cuando el login sea exitoso para que actualice el estado de toda la app.
     @EnvironmentObject var authManager: AuthenticationManager
 
     var body: some View {
+        // `zstack` como vista raiz para mostrar el spinner de carga por encima de todo.
         ZStack {
             Color.appBackground.ignoresSafeArea()
 
             VStack(spacing: 20) {
                 Spacer()
                 
-                Text("Inicia Sesión")
+                Text("inicia sesion")
                     .font(.largeTitle)
                     .padding(.bottom, 20)
                 
+                // seccion para los campos de email y contrasena.
                 VStack(spacing: 0) {
-                    InputViewComponent(text: $viewModel.email, placeholder: "Correo", isError: viewModel.errorMessage != nil)
+                    InputViewComponent(text: $viewModel.email, placeholder: "correo", isError: viewModel.errorMessage != nil)
                     Divider().padding(.horizontal)
-                    SecureInputViewComponent(text: $viewModel.password, placeholder: "Contraseña", isError: viewModel.errorMessage != nil)
+                    SecureInputViewComponent(text: $viewModel.password, placeholder: "contrasena", isError: viewModel.errorMessage != nil)
                 }
                 .background(Color.textFieldBackground)
                 .cornerRadius(16)
                 
+                // seccion para el mensaje de error. aparece solo si hay un error en el viewmodel.
                 if let errorMessage = viewModel.errorMessage {
                     HStack {
                         Image(systemName: "exclamationmark.circle.fill")
@@ -44,39 +55,41 @@ struct LoginView: View {
                     .foregroundColor(.errorRed).font(.caption).padding(.leading)
                 }
                 
-                // --- PUNTO CLAVE ---
-                // Esta es la implementación final y correcta del botón.
+                // el boton principal de login.
                 PrimaryButtonComponent(
-                    title: "Iniciar sesión",
+                    title: "iniciar sesion",
                     action: {
-                        // Para llamar a una función 'async' (que espera en la red),
-                        // la acción debe estar envuelta en un 'Task'.
-                        // Esto ejecuta la llamada a la API en segundo plano sin congelar la app.
+                        // para llamar a una funcion `async` (como la de login que espera a la red)
+                        // desde un closure normal, se debe envolver en un `task`.
+                        // esto ejecuta la llamada a la api en segundo plano sin congelar la ui.
                         Task {
                             await viewModel.login(with: authManager)
                         }
                     },
+                    // el boton solo se puede presionar si `isformvalid` en el viewmodel es `true`.
                     isEnabled: viewModel.isFormValid
                 )
                 
                 Spacer()
 
+                // seccion inferior con enlaces para registrarse o recuperar contrasena.
                 VStack(spacing: 15) {
                     HStack(spacing: 4) {
-                        Text("¿No tienes cuenta?").foregroundColor(.textSecondary)
-                        NavigationLink("Regístrate", destination: SignUpView())
+                        Text("¿no tienes cuenta?").foregroundColor(.textSecondary)
+                        // `navigationlink` para llevar al usuario a la pantalla de registro.
+                        NavigationLink("registrate", destination: SignUpView())
                             .foregroundColor(.textLink).fontWeight(.bold)
                     }
                     HStack(spacing: 4) {
-                        Text("¿Olvidaste tu contraseña?").foregroundColor(.textSecondary)
-                        Button("Recupérala") {}.foregroundColor(.textLink).fontWeight(.bold)
+                        Text("¿olvidaste tu contrasena?").foregroundColor(.textSecondary)
+                        Button("recuperala") {}.foregroundColor(.textLink).fontWeight(.bold)
                     }
                 }
                 .font(.caption)
             }
             .padding(30)
             
-            // El overlay de carga se muestra cuando 'isLoading' es true.
+            // el overlay de carga se muestra cuando `isloading` es true en el viewmodel.
             if viewModel.isLoading {
                 Color.black.opacity(0.4).ignoresSafeArea()
                 ProgressView().scaleEffect(1.5).tint(.white)
@@ -86,7 +99,7 @@ struct LoginView: View {
     }
 }
 
-// La vista previa necesita el AuthenticationManager en su entorno para funcionar.
+// la vista previa necesita el `authenticationmanager` en su entorno para funcionar.
 struct LoginView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {
@@ -95,4 +108,3 @@ struct LoginView_Previews: PreviewProvider {
         }
     }
 }
-

@@ -8,20 +8,33 @@
 
 import SwiftUI
 
+// esta es la vista de swiftui para la pantalla de "mi cuenta".
+// toda la informacion que muestra y las acciones que ejecuta vienen del `accountviewmodel`.
+
+// -- componentes utilizados --
+// - inputviewcomponent
+// - secureinputviewcomponent
+// - passwordrequirementcomponent
+// - successbannercomponent
+// - listitem (vista auxiliar local)
 struct AccountView: View {
     
+    // se crea una instancia del viewmodel. `@stateobject` asegura que viva mientras la vista exista.
     @StateObject private var viewModel = AccountViewModel()
+    // se obtiene el `authmanager` del entorno para poder realizar acciones globales como cerrar sesion.
     @EnvironmentObject var authManager: AuthenticationManager
+    // `@focusstate` nos ayuda a saber si el usuario esta escribiendo en los campos de contrasena.
     @FocusState private var isPasswordEditing: Bool
 
     var body: some View {
+        // la vista principal es un `zstack` para poder poner overlays (banner de exito, indicador de carga).
         ZStack(alignment: .top) {
             Color.appBackground.ignoresSafeArea()
             
             ScrollView {
                 VStack(spacing: 20) {
                     
-                    // --- CAMBIO #1: Se ha añadido un campo para mostrar errores ---
+                    // se muestra solo si hay un mensaje de error en el viewmodel.
                     if let errorMessage = viewModel.errorMessage {
                         Text(errorMessage)
                             .foregroundColor(.errorRed)
@@ -32,31 +45,31 @@ struct AccountView: View {
                             .cornerRadius(8)
                     }
                     
-                    // --- CAMBIO #2: Se han corregido los campos de apellidos ---
+                    // seccion con los campos de informacion del usuario.
                     VStack(spacing: 0) {
-                        InputViewComponent(text: $viewModel.name, placeholder: "Nombre").disabled(!viewModel.isEditing)
+                        // cada campo se conecta al viewmodel con `$` (binding).
+                        // se desactivan si no se esta en modo de edicion.
+                        InputViewComponent(text: $viewModel.name, placeholder: "nombre").disabled(!viewModel.isEditing)
                         Divider().padding(.horizontal)
-                        // Corregido para usar 'fathersLastName' y 'mothersLastName' como en el ViewModel.
-                        InputViewComponent(text: $viewModel.fathersLastName, placeholder: "Apellido Paterno").disabled(!viewModel.isEditing)
+                        InputViewComponent(text: $viewModel.fathersLastName, placeholder: "apellido paterno").disabled(!viewModel.isEditing)
                         Divider().padding(.horizontal)
-                        InputViewComponent(text: $viewModel.mothersLastName, placeholder: "Apellido Materno").disabled(!viewModel.isEditing)
+                        InputViewComponent(text: $viewModel.mothersLastName, placeholder: "apellido materno").disabled(!viewModel.isEditing)
                         Divider().padding(.horizontal)
-                        InputViewComponent(text: $viewModel.username, placeholder: "Nombre de Usuario").disabled(!viewModel.isEditing)
+                        InputViewComponent(text: $viewModel.username, placeholder: "nombre de usuario").disabled(!viewModel.isEditing)
                         Divider().padding(.horizontal)
-                        InputViewComponent(text: $viewModel.email, placeholder: "Correo").disabled(!viewModel.isEditing)
+                        InputViewComponent(text: $viewModel.email, placeholder: "correo").disabled(!viewModel.isEditing)
                         
+                        // los campos para cambiar la contrasena solo aparecen en modo de edicion.
                         if viewModel.isEditing {
                             VStack {
                                 Divider().padding(.horizontal)
-                                // --- CAMBIO #3: Se ha añadido el campo de contraseña actual ---
-                                // Este campo es crucial para autorizar los cambios en el backend.
-                                SecureInputViewComponent(text: $viewModel.currentPassword, placeholder: "Contraseña actual para autorizar")
+                                SecureInputViewComponent(text: $viewModel.currentPassword, placeholder: "contrasena actual para autorizar")
+                                    .focused($isPasswordEditing) // se conecta al focusstate.
+                                Divider().padding(.horizontal)
+                                SecureInputViewComponent(text: $viewModel.newPassword, placeholder: "nueva contrasena (opcional)")
                                     .focused($isPasswordEditing)
                                 Divider().padding(.horizontal)
-                                SecureInputViewComponent(text: $viewModel.newPassword, placeholder: "Nueva contraseña (opcional)")
-                                    .focused($isPasswordEditing)
-                                Divider().padding(.horizontal)
-                                SecureInputViewComponent(text: $viewModel.confirmPassword, placeholder: "Confirmar contraseña", isError: viewModel.passwordsMatch == .failure)
+                                SecureInputViewComponent(text: $viewModel.confirmPassword, placeholder: "confirmar contrasena", isError: viewModel.passwordsMatch == .failure)
                                     .focused($isPasswordEditing)
                             }
                             .transition(.opacity)
@@ -65,7 +78,8 @@ struct AccountView: View {
                     .background(Color.textFieldBackground)
                     .cornerRadius(16)
                     
-                    // Muestra los requisitos de la contraseña si se está editando
+                    // la lista de requisitos de contrasena solo aparece si se esta editando
+                    // y el usuario tiene el teclado activo en uno de los campos de contrasena.
                     if viewModel.isEditing && isPasswordEditing {
                         VStack(alignment: .leading, spacing: 10) {
                             ForEach(PasswordRequirement.allCases, id: \.self) { requirement in
@@ -79,43 +93,44 @@ struct AccountView: View {
                         .transition(.opacity.combined(with: .move(edge: .top)))
                     }
                     
-                    // Botones de acción (sin cambios)
+                    // seccion con los botones de accion (info, cerrar sesion, etc.).
                     VStack {
                         NavigationLink(destination: AppInfoView()) {
-                            ListItem(title: "App info", icon: "info.circle")
+                            ListItem(title: "app info", icon: "info.circle")
                         }
-                        ListItem(title: "Cerrar sesión", icon: "rectangle.portrait.and.arrow.right", action: { viewModel.showLogoutAlert = true })
-                        ListItem(title: "Eliminar mi cuenta", icon: "trash", color: .errorRed, action: { viewModel.showDeleteAlert = true })
+                        ListItem(title: "cerrar sesion", icon: "rectangle.portrait.and.arrow.right", action: { viewModel.showLogoutAlert = true })
+                        ListItem(title: "eliminar mi cuenta", icon: "trash", color: .errorRed, action: { viewModel.showDeleteAlert = true })
                     }
                     .background(Color.textFieldBackground)
                     .cornerRadius(16)
                 }
                 .padding()
             }
-            .disabled(viewModel.isLoading) // Deshabilita la vista mientras carga
+            .disabled(viewModel.isLoading) // se deshabilita toda la vista mientras se carga.
             
-            // Muestra el banner de éxito
+            // --- overlays ---
+            
+            // muestra el banner de exito si `showsuccessbanner` es true en el viewmodel.
             if viewModel.showSuccessBanner {
-                SuccessBannerComponent(message: "Cambios guardados exitosamente")
+                SuccessBannerComponent(message: "cambios guardados exitosamente")
                     .padding(.horizontal)
                     .transition(.move(edge: .top).combined(with: .opacity))
             }
             
-            // Muestra el indicador de carga
+            // muestra el indicador de carga si `isloading` es true en el viewmodel.
             if viewModel.isLoading {
                 Color.black.opacity(0.4).ignoresSafeArea()
                 ProgressView().scaleEffect(1.5).tint(.white)
             }
         }
-        .navigationTitle("Mi cuenta")
+        .navigationTitle("mi cuenta")
         .toolbar {
+            // el boton de la barra de navegacion cambia entre "editar" y "guardar"
+            // y se activa/desactiva segun el estado del viewmodel.
             ToolbarItem(placement: .navigationBarTrailing) {
-                Button(viewModel.isEditing ? "Guardar" : "Editar") {
+                Button(viewModel.isEditing ? "guardar" : "editar") {
                     if viewModel.isEditing {
-                        // --- CAMBIO #4: La llamada a guardar ahora está en un Task ---
-                        Task {
-                            await viewModel.saveChanges()
-                        }
+                        Task { await viewModel.saveChanges() }
                     } else {
                         viewModel.isEditing.toggle()
                     }
@@ -125,8 +140,8 @@ struct AccountView: View {
                 .tint(.primaryBlue)
             }
         }
-        // --- CAMBIO #5: Llama a la API cuando la vista aparece ---
         .onAppear {
+            // cuando la vista aparece por primera vez, le pide al viewmodel que cargue los datos del perfil.
             Task {
                 await viewModel.fetchUserProfile()
             }
@@ -134,19 +149,21 @@ struct AccountView: View {
         .animation(.easeInOut, value: viewModel.isEditing)
         .animation(.easeInOut, value: viewModel.showSuccessBanner)
         .animation(.easeInOut, value: isPasswordEditing)
-        .alert("Cerrar sesión", isPresented: $viewModel.showLogoutAlert) {
-            Button("No", role: .cancel) {}
-            Button("Sí", role: .destructive) { authManager.logout() }
-        } message: { Text("¿Seguro que quieres salir?") }
-        .alert("Eliminar mi cuenta", isPresented: $viewModel.showDeleteAlert) {
-            Button("No", role: .cancel) {}
-            Button("Sí", role: .destructive) { authManager.logout() }
-        } message: { Text("¿Seguro que quieres eliminarla? Esta acción es permanente y no podrás volver a acceder.") }
+        // las alertas tambien se controlan con booleanos del viewmodel.
+        // la accion de cerrar sesion se delega al `authmanager`.
+        .alert("cerrar sesion", isPresented: $viewModel.showLogoutAlert) {
+            Button("no", role: .cancel) {}
+            Button("si", role: .destructive) { authManager.logout() }
+        } message: { Text("¿seguro que quieres salir?") }
+        .alert("eliminar mi cuenta", isPresented: $viewModel.showDeleteAlert) {
+            Button("no", role: .cancel) {}
+            Button("si", role: .destructive) { authManager.logout() }
+        } message: { Text("¿seguro que quieres eliminarla? esta accion es permanente y no podras volver a acceder.") }
     }
 }
 
 
-// El componente ListItem y la Vista Previa se mantienen igual
+// un componente de vista auxiliar y reutilizable para los items de la lista de acciones.
 struct ListItem: View {
     let title: String
     let icon: String
@@ -180,4 +197,3 @@ struct ListItem: View {
             .environmentObject(AuthenticationManager())
     }
 }
-

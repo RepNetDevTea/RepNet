@@ -4,24 +4,25 @@
 //
 //  Created by Angel Bosquez on 02/10/25.
 //
+// este archivo define los dtos para crear y recibir reportes de la api.
 
 import Foundation
 
-// --- DTO para ENVIAR un nuevo reporte ---
-// Representa el JSON que el backend espera al crear un reporte.
+// este es el objeto que la app *envia* al backend para crear un nuevo reporte.
+// `encodable` significa que se puede convertir a json.
 struct CreateReportRequestDTO: Encodable {
     let reportTitle: String
     let reportUrl: String
     let reportDescription: String
-    let severity: Int // El backend espera un número (0, 1, 2...)
-    let siteDomain: String // El dominio del sitio asociado
-    let tags: [String] // Nombres de los tags/categorías
-    let impacts: [String] // Nombres de los impactos
+    let siteDomain: String
+    let tags: [String]
+    let impacts: [String]
 }
 
+// este es el objeto que la app *recibe* del backend, representando un reporte completo.
+// `decodable` significa que se puede crear a partir de un json.
+// `identifiable` es para que swiftui pueda usarlo en listas y saber cual es cual.
 
-// --- DTO para RECIBIR un reporte ---
-// Representa el JSON que el backend nos devuelve para un reporte existente.
 struct ReportResponseDTO: Decodable, Identifiable {
     let id: Int
     let reportTitle: String
@@ -30,20 +31,16 @@ struct ReportResponseDTO: Decodable, Identifiable {
     let reportStatus: String
     let severity: Int
     let createdAt: String
-    let site: SiteDTO
-    let user: UserInReportDTO
+    let site: SiteDTO?
+    let user: UserInReportDTO?
     let tags: [TagDTO]
+    let voteScore: Int?
+    let userVoteStatus: UserVoteStatus?
 }
 
-// Sub-DTOs que vienen dentro de la respuesta de un reporte.
-struct SiteDTO: Decodable {
-    let siteDomain: String
-}
-
-struct UserInReportDTO: Decodable {
-    let username: String
-}
-
-struct TagDTO: Decodable {
-    let tagName: String
-}
+// representa el sitio asociado a un reporte.
+struct SiteDTO: Decodable { let siteDomain: String }
+// representa al usuario que creo el reporte.
+struct UserInReportDTO: Decodable { let username: String }
+// representa tag del reporte
+struct TagDTO: Decodable { let tagName: String }

@@ -4,6 +4,12 @@
 //
 //  Created by Angel Bosquez on 28/09/25.
 //
+//
+//un campo de texto estandar y reutilizable para formularios.
+//
+//este componente envuelve un `textfield` de swiftui, anadiendo estilos
+//consistentes para la app y manejo visual de errores.
+//pensando para correos electronicos
 
 import SwiftUI
 
@@ -14,16 +20,18 @@ struct InputViewComponent: View {
 
     var body: some View {
         TextField(placeholder, text: $text)
+        // cambia el color del texto para dar feedback visual de error
             .font(.bodyText)
             .foregroundColor(isError ? .errorRed : .textPrimary)
             .padding(15)
             .autocapitalization(.none)
+        //pensando para emails
             .keyboardType(.emailAddress)
     }
 }
 
 #Preview {
-    //Binding creado con IA para ver cambios en tiempo real
+    //preview en ia 
     struct PreviewWrapper: View {
         @State var textNormal = ""
         @State var textError = "texto incorrecto"

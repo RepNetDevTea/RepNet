@@ -8,20 +8,70 @@
 import Foundation
 import SwiftUI
 
+// este es el viewmodel para la pantalla de "reportes publicos".
+// su logica es mas simple que la de `myreportsviewmodel`, ya que solo se encarga
+// de obtener la lista publica de reportes, ordenarla por fecha y mostrarla.
+@MainActor
 class PublicReportsViewModel: ObservableObject {
     
-    @Published var selectedFilter: String = "Todos"
-    let filterOptions = ["Todos", "Trending"]
+    private let reportsAPIService = ReportsAPIService()
     
-    // Los datos de ejemplo ahora se crean con todos los campos requeridos por el nuevo 'Report.swift'
-    // y se omite la información de estado.
-    @Published var publicReports: [Report] = [
-        Report(displayId: "PUB-001", title: "Vulnerabilidad en servidor", date: "29 septiembre 2025", url: "https://server.vulnerable.com", description: "Se encontró una vulnerabilidad de tipo X en el servidor.", category: "Otro", severity: "Severa"),
-        Report(displayId: "PUB-002", title: "Campaña de Phishing masiva", date: "25 septiembre 2025", url: "https://phishing-campaign.com", description: "Una campaña de phishing está suplantando la identidad de la empresa Y.", category: "Phishing", severity: "Alta"),
-        Report(displayId: "PUB-003", title: "Fallo en sistema de correo", date: "22 septiembre 2025", url: "https://mail-provider.com", description: "El sistema de correo presenta un fallo que permite el envío de spam.", category: "Malware", severity: "Media")
-    ]
+    // -- datos y estado de la ui --
+    // no necesita manejar filtros, solo la lista de reportes y los estados de carga/error.
+    @Published var reports: [Report] = []
+    @Published var isLoading = false
+    @Published var errorMessage: String? = nil
     
-    var filteredReports: [Report] {
-        return publicReports
+    // carga los reportes publicos desde el backend.
+    func fetchPublicReports() async {
+        // evita que se hagan multiples llamadas si ya se esta cargando una (ej. pull-to-refresh).
+        guard !isLoading else { return }
+        isLoading = true
+        errorMessage = nil
+        
+        do {
+            // 1. se obtienen los datos crudos (dtos) de la api.
+            let reportDTOs = try await reportsAPIService.fetchPublicReports()
+            
+            // 2. se convierten los dtos a modelos `report` de la ui.
+            let mappedReports = mapDTOsToReports(reportDTOs)
+            
+            // 3. se ordenan los reportes, poniendo los mas nuevos (`createdat`) primero.
+            self.reports = mappedReports.sorted { $0.createdAt > $1.createdAt }
+            
+        } catch {
+            print("❌ error al obtener reportes publicos: \(error)")
+            self.errorMessage = "no se pudieron cargar los reportes."
+        }
+        isLoading = false
+    }
+    
+    // -- funcion de mapeo --
+    
+    // funcion auxiliar para convertir los dtos de la api a modelos `report`.
+    // esta version es simplificada especificamente para la vista publica.
+    private func mapDTOsToReports(_ dtos: [ReportResponseDTO]) -> [Report] {
+        let formatter = ISO8601DateFormatter()
+        
+        return dtos.map { dto in
+            // se convierte el string de la fecha a un objeto date real.
+            let createdAtDate = formatter.date(from: dto.createdAt) ?? Date()
+            
+            return Report(
+                displayId: String(dto.id),
+                title: dto.reportTitle,
+                date: createdAtDate.formatted(date: .long, time: .omitted), // se crea la fecha legible.
+                url: dto.reportUrl,
+                description: dto.reportDescription,
+                category: dto.tags.first?.tagName ?? "general",
+                // nota: se simplifican algunos campos para la vista publica.
+                // la severidad se pone por defecto y no se incluyen el estado ni el color de estado.
+                severity: "baja",
+                user: dto.user ?? UserInReportDTO(username: "anonimo"),
+                createdAt: createdAtDate, // se guarda la fecha real para poder ordenar.
+                voteScore: dto.voteScore,
+                userVoteStatus: dto.userVoteStatus
+            )
+        }
     }
 }

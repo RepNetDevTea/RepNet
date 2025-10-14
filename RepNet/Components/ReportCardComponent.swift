@@ -4,46 +4,54 @@
 //
 //  Created by Angel Bosquez on 29/09/25.
 //
+// una vista que representa una "tarjeta" o un item en una lista de reportes.
+// muestra la informacion mas importante de un reporte de forma resumida.
+// reutiliza otros componentes como `tagcomponent` y `statusindicatorcomponent`.
 
 import SwiftUI
 
 struct ReportCardComponent: View {
+    // el objeto `report` que contiene toda la informacion a mostrar.
     let report: Report
 
     var body: some View {
-        HStack {
+        // estructura principal: contenido a la izquierda, indicador y flecha a la derecha.
+        HStack(alignment: .top) {
             VStack(alignment: .leading, spacing: 10) {
-                // --- CAMBIO AQUÍ ---
-                // Ahora simplemente llamamos al TagComponent "inteligente" pasándole el texto.
-                // Ya no necesita los parámetros de color.
                 HStack {
+                    // muestra la categoria y severidad como tags
                     TagComponent(text: report.category)
                     TagComponent(text: report.severity)
                 }
-                
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(report.title)
-                        .font(.body)
-                        .fontWeight(.semibold)
-                        .foregroundColor(.textPrimary)
-                    Text(report.date)
-                        .font(.caption)
-                        .foregroundColor(.textSecondary)
+                    Text(report.title).font(.body).fontWeight(.semibold)
+                    Text(report.date).font(.caption).foregroundColor(.textSecondary)
                 }
             }
-            
             Spacer()
             
-            VStack(alignment: .trailing) {
-                if let statusText = report.statusText, let statusColor = report.statusColor {
-                    StatusIndicatorComponent(statusText: statusText, statusColor: statusColor)
-                }
+            // logica condicional: muestra el estado o la puntuacion, pero no ambos.
+            // esto permite que la tarjeta se adapte a diferentes contextos (ej. reportes publicos vs. mis reportes).
+            
+            // si el reporte tiene un estado (ej. "en revision"), se muestra aqui.
+            
+            if let statusText = report.statusText, let statusColor = report.statusColor {
+                StatusIndicatorComponent(statusText: statusText, statusColor: statusColor)
+            } else if let score = report.voteScore {
                 
-                Spacer()
-                Image(systemName: "chevron.right")
-                    .foregroundColor(.textSecondary)
+            // si el reporte no tiene estado pero si puntuacion, se muestra la puntuacion.
+                
+                HStack(spacing: 4) {
+                    // Usamos un icono más neutral de "puntuación".
+                    Image(systemName: "arrow.up.arrow.down.circle.fill")
+                        .foregroundColor(.textSecondary)
+                    // Usamos nuestra extensión para formatear el número. Puede mostrar negativos.
+                    Text(score.formattedK)
+                        .font(.caption)
+                        .fontWeight(.bold)
+                }
             }
-            .frame(height: 50)
+            Image(systemName: "chevron.right").foregroundColor(.textSecondary)
         }
         .padding()
         .background(Color.textFieldBackground)
@@ -52,23 +60,3 @@ struct ReportCardComponent: View {
     }
 }
 
-// La vista previa también se actualiza para usar el nuevo modelo de Report.
-struct ReportCardComponent_Previews: PreviewProvider {
-    static var previews: some View {
-        VStack(spacing: 20) {
-            let reportWithStatus = Report(
-                displayId: "123", title: "Reporte con Estado", date: "2 sep 2025", url: "", description: "",
-                category: "Phishing", severity: "Alta", statusText: "Revisión", statusColor: .statusReview
-            )
-            ReportCardComponent(report: reportWithStatus)
-            
-            let reportWithoutStatus = Report(
-                displayId: "456", title: "Reporte sin Estado", date: "2 sep 2025", url: "", description: "",
-                category: "Malware", severity: "Media"
-            )
-            ReportCardComponent(report: reportWithoutStatus)
-        }
-        .padding()
-        .background(Color.appBackground)
-    }
-}

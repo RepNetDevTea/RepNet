@@ -11,13 +11,12 @@ import Foundation
 extension String {
     
     // Devuelve 'true' si el String tiene un formato de correo electrónico válido.
-    // (Sin cambios, ya que usa regex de la forma recomendada).
+    //seguimos regex del profe
     var esCorreoValido: Bool {
         let emailPredicate = NSPredicate(format:"SELF MATCHES %@", "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}")
         return emailPredicate.evaluate(with: self)
     }
     
-    // --- NUEVAS PROPIEDADES PARA LA LONGITUD DE LA CONTRASEÑA ---
     
     // Devuelve 'true' si el String cumple con la longitud mínima requerida.
     var tieneLongitudMinima: Bool {
@@ -39,12 +38,8 @@ extension String {
         return self.rangeOfCharacter(from: .decimalDigits) != nil
     }
     
-    // --- MEJORA ---
-    // Ahora incluye un conjunto más completo de caracteres especiales comunes.
-    // La prevención de inyección SQL es responsabilidad del backend.
+    // devuelve `true` si el string contiene al menos uno de los caracteres especiales definidos.
     var tieneCaracterEspecial: Bool {
-        // Buscamos la presencia de cualquiera de los caracteres dentro del conjunto [].
-        // MODIFICADO: El conjunto de caracteres especiales ahora está limitado a los que solicitaste.
         return self.range(of: "[!@#$%^&*?]", options: .regularExpression) != nil
     }
     

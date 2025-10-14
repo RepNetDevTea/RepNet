@@ -4,32 +4,37 @@
 //
 //  Created by Angel Bosquez on 29/09/25.
 //
+//boton en forma de pildora disenado para ser usado en filtros y ordenes
+
 
 
 import SwiftUI
 
 struct FilterButtonComponent: View {
-    //titulo en binding para reflejar ubicacion
+    //binding para guardar input
     @Binding var selection: String
+    //arreglo que muestra opciones
     let options: [String]
+    //nombre del icono a la izqueirda
     let iconName: String
 
     var body: some View {
-        // El Button se convierte en un Menu
+        //en si es un menu
         Menu {
-            // El contenido del menú son las opciones
+            //cada elemento del arreglo se convierte en un boton del menu
             ForEach(options, id: \.self) { option in
                 Button(action: {
+                    //se actuaaliza el boton del binding
                     selection = option
                 }) {
                     Text(option)
                 }
             }
         } label: {
-            // La etiqueta del menú mantiene la apariencia original del botón
+            //etiqueta del menu, lo que el usuario ve
             HStack(spacing: 5) {
                 Image(systemName: iconName)
-                // El texto ahora muestra la selección actual
+                //texto del menu refleja seleccion actual
                 Text(selection)
             }
             .font(.caption)
@@ -42,7 +47,7 @@ struct FilterButtonComponent: View {
     }
 }
 
-// Usamos PreviewProvider para máxima compatibilidad
+// preview hecha con ia
 struct FilterButtonComponent_Previews: PreviewProvider {
     struct PreviewWrapper: View {
         @State private var categorySelection = "Malware"
