@@ -153,8 +153,30 @@ export class ReportsService {
     const updatedAt = new Date().toISOString();
     return await this.prisma.report.update({ 
       where: { id: report.id }, 
-      data: { ...data, updatedAt }, 
+      data: { ...data, reportStatus: 'pending', updatedAt }, 
     });  
+  }
+
+  async updateReportStatusById(reportId: number, data: Prisma.ReportUpdateInput) {
+    const report = await this.findReportById(reportId);
+    if (!report)
+      return null;
+
+    const validStatuses = ['approved', 'rejected'];
+
+    const newReportStatus = data.reportStatus as string;
+    if (!validStatuses.includes(newReportStatus))
+      return null;
+
+    const storedReportStatus = report.reportStatus;
+    if (validStatuses.includes(storedReportStatus))
+      return null;
+
+    const updatedAt = new Date().toISOString();
+    return await this.prisma.report.update({ 
+      where: { id: report.id }, 
+      data: { ...data, updatedAt },  
+    })
   }
 
   async findEvidencesById(reportId: number) {

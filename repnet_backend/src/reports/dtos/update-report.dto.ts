@@ -25,20 +25,20 @@ export class UpdateReportDto {
   @IsOptional()
   @IsArray()
   @Type(() => TagReferenceDto)
-  addedTags: TagReferenceDto[]
+  addedTags: TagReferenceDto[];
 
   @IsOptional()
   @IsArray()
   @Type(() => TagReferenceDto)
-  deletedTags: TagReferenceDto[]
+  deletedTags: TagReferenceDto[];
 
   @IsOptional()
   @IsArray()
   @Type(() => ImpactReferenceDto)
-  addedImpacts: ImpactReferenceDto[]
+  addedImpacts: ImpactReferenceDto[];
 
   @IsOptional()
   @IsArray()
   @Type(() => ImpactReferenceDto)
-  deletedImpacts: ImpactReferenceDto[]
+  deletedImpacts: ImpactReferenceDto[];
 }

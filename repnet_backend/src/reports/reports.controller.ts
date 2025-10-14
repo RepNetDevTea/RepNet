@@ -20,6 +20,7 @@ import { VotesService } from 'src/votes/votes.service';
 import computeSeverityMetric from './utils/compute-severity-metric';
 import promptBuilder from './utils/promptBuilder';
 import { BedrockService } from 'src/aws/bedrock.service';
+import { UpdateReportStatustDto } from './dtos/update-report-status.dto';
 
 @Controller('reports')
 export class ReportsController {
@@ -88,7 +89,8 @@ export class ReportsController {
     } = body;
 
     const updatedReport = await this.reportsService.updateReportById(
-      reportId, reportAttrsToUpdate, addedTags, deletedTags, addedImpacts, deletedImpacts);
+      reportId, reportAttrsToUpdate, addedTags, deletedTags, addedImpacts, deletedImpacts
+    );
 
     if (!updatedReport)
       throw new NotFoundException('The report was not found');
@@ -103,6 +105,21 @@ export class ReportsController {
       throw new NotFoundException('The report was not found');
 
     return deletedReport;
+  }
+
+  @Patch(':reportId/status')
+  async updateReportStatus(
+    @Param('reportId', new ParseIntPipe) reportId: number, 
+    @Body() body: UpdateReportStatustDto, 
+  ) {
+    const updatedReport = await this.reportsService.updateReportStatusById(
+      reportId, body
+    );
+
+    if (!updatedReport)
+      throw new HttpException('Could not update the status of the report', 400);
+
+    return updatedReport;
   }
 
   @Post(':reportId/toggleVote')
