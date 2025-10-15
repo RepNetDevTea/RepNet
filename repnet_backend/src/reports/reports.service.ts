@@ -109,7 +109,7 @@ export class ReportsService {
       where: { id: reportId },
       include: {
         votes: true, 
-        site: { select: { id: true, siteDomain: true } }, 
+        site: { select: { id: true, siteDomain: true, } }, 
         user: { select: { username: true } }, 
         evidences: { select: { id: true, evidenceType: true,  evidenceKey: true , evidenceFileUrl: true, evidenceFileUri: true } }, 
         tags: { select: { tag: { select: { id: true, tagName: true, tagScore: true, tagDescription: true } } } }, 

@@ -1,9 +1,9 @@
 const getMetricSection = (type, metrics) => {
-  return metrics.map(({ metric }) => {
+  return metrics.map((metric) => {
     return `
-      Tag: ${metric[`${type}Name`]}\n
-      \tSeverity score: ${metric[`${type}Score`]}\n
-      \tDescription: ${metric[`${type}Description`]}`;
+      Tag: ${metric[type][`${type}Name`]}\n
+      \tSeverity score: ${metric[type][`${type}Score`]}\n
+      \tDescription: ${metric[type][`${type}Description`]}`;
   }).join('\n\n');
 };
 
@@ -55,20 +55,24 @@ export default (context) => {
 
     You are given the evidence files (images, screenshots, or other attachments) that 
     the user submitted. Your job is to evaluate how credible and strong this evidence 
-    is, and classify it into one of three categories:
+    is, and classify it into one of three categories where each has a interval where 
+    bounds are included:
 
-    Low (10): Weak, irrelevant, or inconclusive evidence.
+    Low: Weak, irrelevant, or inconclusive evidence. Interval where the score
+    could fall is [0-39]
 
-    Medium (40): Clear and relevant evidence that supports the report, but not extremely 
-    severe by itself.
+    Medium: Clear and relevant evidence that supports the report, but not 
+    extremely severe by itself. Interval where the score could fall is [40-69]
 
-    High (70): Strong, credible evidence showing direct malicious activity or high damage 
-    potential (e.g., working phishing site, active malware sample, confirmed identity theft proof).
+    High: Strong, credible evidence showing direct malicious activity or high 
+    damage potential (e.g., working phishing site, active malware sample, confirmed 
+    identity theft proof). Interal wehre the score could fal is [70-100].
 
     Final Task:
-    Return only the evidence severity score (10, 40, or 70) according to your expert 
-    judgment. Do not recalculate tags or impacts—they are already computed by the system. 
-    Your assessment should focus strictly on the evidences provided.
+    Return only the evidence severity score according to your expert judgment, there's 
+    no need of your rationale. Do not recalculate tags or impacts—they are already 
+    computed by the system. Your assessment should focus strictly on the evidences 
+    provided.
   `;
 
   return {

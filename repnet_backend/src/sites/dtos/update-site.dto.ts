@@ -16,4 +16,8 @@ export class UpdateSiteDto {
   @Min(0)
   @Max(100)
   siteReputation: number;
+
+  @IsOptional()
+  @IsInt()
+  accumulatedSeverity: number;
 }

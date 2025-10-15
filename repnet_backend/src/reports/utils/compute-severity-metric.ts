@@ -1,5 +1,7 @@
 export default (metricType, metrics) => {
-  const scores = metrics.map(({ metric }) => metric[`${metricType}Score`]);
+  const scores = metrics.map((metric) => (
+    metric[metricType][`${metricType}Score`]
+  ));
 
   const maxScore = Math.max(...scores);
 

@@ -50,6 +50,7 @@ export class SitesController {
       throw new NotFoundException('The site was not found');
 
     const {createdAt, ...remainingSiteData} = site;
+
     return { 
       ...remainingSiteData, 
       createdAt: createdAt.toLocaleString('es-MX'), 
@@ -88,6 +89,10 @@ export class SitesController {
       return accum + report.severity;
     }, 0);
     const reputation = accumulatedSeverity / reports.length;
-    return reputation;
+
+    if (!Number.isNaN(reputation) && site.siteReputation !== reputation)
+      return this.sitesService.updateSiteById(site.id, { siteReputation: reputation });
+  
+    return site.siteReputation;
   }
 }

@@ -50,7 +50,7 @@ export class ReportsController {
       ...reportData,
       user: { connect: { id: userId } },
       site: { connect: { id: site.id } }, 
-    }
+    };
   
     const report = await this.reportsService.createReport(data, tags, impacts);
     if (!report)
@@ -158,15 +158,21 @@ export class ReportsController {
     if (!report)
       throw new NotFoundException('The report was not found');
 
-    const {reportUrl, reportDescription, tags, impacts, evidences } = report;
+    const {
+      reportUrl, 
+      reportDescription, 
+      tags, 
+      impacts, 
+      evidences, 
+    } = report;
 
     const tagWeight = 0.2;
     const tagsScore = computeSeverityMetric('tag', tags);
-    const realTagScore = tagWeight * tagsScore;
+    const realTagScore = Math.round(tagWeight * tagsScore);
 
     const impactWeight = 0.35;
     const impactsScore = computeSeverityMetric('impact', impacts);
-    const realImpactScore = impactWeight * impactsScore;
+    const realImpactScore = Math.round(impactWeight * impactsScore);
 
     const base64images = await Promise.all(
       evidences.map(async ({ evidenceKey }) => {
@@ -200,9 +206,22 @@ export class ReportsController {
     }
 
     const prompt = promptBuilder(context);
-    const bedrockOutput = this.bedrockService.scoreEvidence(prompt); 
+    const bedrockOutput = await this.bedrockService.scoreEvidence(prompt); 
+    const evidenceWeight = 0.45
+    const evidenceScore = parseInt(bedrockOutput.content[0].text);
+    const realEvidenceScore = Math.round(evidenceWeight * evidenceScore);
 
-    return bedrockOutput;
+    const totalScore = realTagScore + realImpactScore + realEvidenceScore;
+    console.log(`${realTagScore} + ${realImpactScore} + ${realEvidenceScore} = ${totalScore}`);
+
+    return await this.reportsService.updateReportById(
+      report.id, 
+      { severity: totalScore }, 
+      undefined, 
+      undefined, 
+      undefined, 
+      undefined, 
+    );
   }
 
   @Post(':reportId/evidences')
