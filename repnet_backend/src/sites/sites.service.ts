@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
+import { report } from 'process';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
@@ -28,8 +29,29 @@ export class SitesService {
     return await this.prisma.site.create({ data });
   }
   
-  async getAllSites() {
-    return await this.prisma.site.findMany({ include: { reports: true } });
+  async getSites(page: number) {
+    const sitesPerRequest = 10;
+    const skip = (page - 1) * sitesPerRequest;
+
+    const [sites, totalNumberOfSites ] =  await Promise.all([
+      await this.prisma.site.findMany({
+        include: { reports: true }, 
+        skip, 
+        take: sitesPerRequest, 
+      }), 
+      await this.prisma.site.count(), 
+    ]);     
+
+    const totalNumberOfPages = Math.ceil(totalNumberOfSites / sitesPerRequest);
+
+    return {
+      sites, 
+      metaData: {
+        currentPage: page, 
+        totalNumberOfPages,
+        totalNumberOfSites, 
+      }
+    };
   }
   
   async updateSiteById(siteId: number, data: Prisma.SiteUpdateInput) {

@@ -17,7 +17,10 @@ export class SitesController {
   }
 
   @Get()
-  async getSites(@Query('siteDomain') siteDomain?: string) {
+  async getSites(
+    @Query('page') page?: string, 
+    @Query('siteDomain') siteDomain?: string, 
+  ) {
     if (siteDomain) {
       const site = await this.sitesService.findSite({ siteDomain });
       if (!site)
@@ -30,14 +33,14 @@ export class SitesController {
       };
     }
     
-    const sites = await this.sitesService.getAllSites();
-    if (!sites.length)
+    if (page !== undefined && typeof parseInt(page) !== 'number')
+      throw new HttpException('Missing page number', 400);
+
+    const data = await this.sitesService.getSites(parseInt(page as string));
+    if (!data.sites.length)
       throw new HttpException('There are no sites', 400);
 
-    return sites.map(({createdAt, ...remainingData}) => ({ 
-      ...remainingData, 
-      createdAt: createdAt.toLocaleString('es-MX') 
-    }));
+    return data;
   }
 
   @Get(':siteId')
