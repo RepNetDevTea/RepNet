@@ -6,14 +6,18 @@ import type { Request } from 'express';
 import { instanceToPlain } from 'class-transformer';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { UpdateUserAdminDto } from './dtos/update-user-admin.dto';
+import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
+
+@ApiTags('usuarios')
 @Controller('users')
-export class UsersController {
+export class UsersController { 
   constructor(
     private readonly userService: UsersService, 
   ) {}
 
   @Post()
+  @ApiOperation({ summary: 'Crea un nuevo usuario' })
   async createUser(@Body() body: CreateUserDto) {
     const { newUser, accessToken, refreshToken } = await this.userService.createUser(body);
     if (!newUser)
@@ -23,6 +27,7 @@ export class UsersController {
   }
 
   @Get()
+  @ApiOperation({ summary: 'llama todos los usuarios' })
   async getUsers() {
     const users = await this.userService.getUsers(null);
     if (!users)
@@ -33,6 +38,7 @@ export class UsersController {
 
   @Get('me')
   @UseGuards(AccessJwtAuthGuard)
+  @ApiOperation({ summary: 'regresa la informacion del usuario' })
   async getUser(@Req() req: Request) {
     const { id, userStatus } = instanceToPlain(req.user);
     const user = await this.userService.findUserById(id);

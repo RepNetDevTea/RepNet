@@ -2,6 +2,7 @@ import { Body, Controller, Delete, Get, NotFoundException, Param, ParseIntPipe, 
 import { CreateTagDto } from './dtos/create-tag.dto';
 import { TagsService } from './tags.service';
 import { UpdateTagDto } from './dtos/update-tag.dto';
+import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
 @Controller('tags')
 export class TagsController {

@@ -1,5 +1,6 @@
 import { Body, Controller, Delete, Get, NotFoundException, Param, ParseIntPipe, Patch } from '@nestjs/common';
 import { EvidencesService } from './evidences.service';
+import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
 @Controller('evidences')
 export class EvidencesController {

@@ -2,6 +2,7 @@ import { Body, Controller, Delete, Get, HttpException, NotFoundException, Param,
 import { VotesService } from './votes.service';
 import { CreateVoteAdminDto } from './dtos/create_vote_admin.dto';
 import { UpdateVoteAdminDto } from './dtos/update-vote-adimn.dto';
+import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
 @Controller('votes')
 export class VotesController {

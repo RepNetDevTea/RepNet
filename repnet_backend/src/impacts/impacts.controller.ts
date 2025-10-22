@@ -2,6 +2,7 @@ import { Body, Controller, Delete, Get, HttpException, NotFoundException, Param,
 import { CreateImpactDto } from './dtos/create-impact.dto';
 import { ImpactsService } from './impacts.service';
 import { UpdateImpactDto } from './dtos/update-impact.dto';
+import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
 @Controller('impacts')
 export class ImpactsController {
