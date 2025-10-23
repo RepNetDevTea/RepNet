@@ -5,6 +5,7 @@ import { classToPlain } from 'class-transformer';
 import { AuthService } from './auth.service';
 import { AccessJwtAuthGuard } from './guards/access-jwt-auth.guard';
 import { RefreshJwtAuthGuard } from './guards/refresh-jwt-auth.guard';
+import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
 @Controller('auth')
 export class AuthController {

@@ -2,6 +2,7 @@ import { Body, Controller, Delete, Get, HttpException, NotFoundException, Param,
 import { SitesService } from './sites.service';
 import { CreateSiteDto } from './dtos/create-site.dto';
 import { UpdateSiteDto } from './dtos/update-site.dto';
+import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
 @Controller('sites')
 export class SitesController {
@@ -16,7 +17,7 @@ export class SitesController {
     return createdSite;
   }
 
-  @Get()
+  @Get() 
   async getSites(
     @Query('page') page?: string, 
     @Query('siteDomain') siteDomain?: string, 

@@ -21,6 +21,7 @@ import computeSeverityMetric from './utils/compute-severity-metric';
 import promptBuilder from './utils/promptBuilder';
 import { BedrockService } from 'src/aws/bedrock.service';
 import { UpdateReportStatustDto } from './dtos/update-report-status.dto';
+import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
 @Controller('reports')
 export class ReportsController {
