@@ -5,6 +5,7 @@ import { randomBytes, scrypt as _scrypt } from 'crypto';
 import { promisify } from 'util';
 import { AuthService } from 'src/auth/auth.service';
 import * as argon2 from 'argon2';
+import { S3Service } from 'src/aws/s3.service';
 
 const scrypt = promisify(_scrypt);
 
@@ -13,6 +14,7 @@ export class UsersService {
   constructor(
     private readonly prisma: PrismaService, 
     private readonly authService: AuthService, 
+    private readonly s3Service: S3Service,
   ) {}
   
   async hashPassword(password: string) {
@@ -77,13 +79,33 @@ export class UsersService {
     if (!user)
       return null;
 
-    const userReports = await this.prisma.report.findMany({ where: { userId: user.id } });
-    if (userReports.length)
-      await this.prisma.report.deleteMany({ where: { userId: user.id } });
+    await this.prisma.vote.deleteMany({ where: { userId: user.id } });
 
-    const userVotes = await this.prisma.vote.findMany({ where: { userId: user.id } });
-    if (userVotes.length)
-      await this.prisma.vote.deleteMany({ where: { userId: user.id } });
+    const userReports = await this.prisma.report.findMany({ where: { userId: user.id}, include: { evidences: { select: { evidenceKey: true } } } });
+    if (userReports.length) {
+      const reportIds = userReports.map(({ id }) => id);
+
+      await Promise.all([
+        this.prisma.reportTags.deleteMany({ where: { reportId: { in: reportIds } } }), 
+        this.prisma.reportImpacts.deleteMany({ where: { reportId: { in: reportIds } } }),  
+        this.prisma.vote.deleteMany({ where: { reportId: { in: reportIds } } }), 
+      ]);
+
+      await Promise.all(
+        userReports.map(async ({ id, evidences }) => {
+          await Promise.all(
+            evidences.map(async ({ evidenceKey }) => {
+              if (typeof evidenceKey === 'string')
+                await this.s3Service.delete(evidenceKey);
+            })
+          );
+
+          await this.prisma.evidence.deleteMany({ where: { reportId: id } });
+        }), 
+      );
+
+      await this.prisma.report.deleteMany({ where: { userId: user.id } });
+    }
 
     return await this.prisma.user.delete({ where: { id: user.id } });
   }
