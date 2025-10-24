@@ -77,6 +77,14 @@ export class UsersService {
     if (!user)
       return null;
 
+    const userReports = await this.prisma.report.findMany({ where: { userId: user.id } });
+    if (userReports.length)
+      await this.prisma.report.deleteMany({ where: { userId: user.id } });
+
+    const userVotes = await this.prisma.vote.findMany({ where: { userId: user.id } });
+    if (userVotes.length)
+      await this.prisma.vote.deleteMany({ where: { userId: user.id } });
+
     return await this.prisma.user.delete({ where: { id: user.id } });
   }
 }
