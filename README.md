@@ -15,7 +15,7 @@ Asegúrate de tener instalado:
 El servidor está construido sobre los siguientes bloques tecnológicos:
 
 - ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white) — Lenguaje de programación  
-- ![NestJS](https://img.shields.io/badge/NestJS-E0234E?logo=nestjs&logoColor=white) — Framework backend  
+- ![NestJS](https://img.shields.io/badge/NestJS-E0234E?logo=nestjs&logoColor=white) — Backend framework  
 - ![Prisma](https://img.shields.io/badge/Prisma-2D3748?logo=prisma&logoColor=white) — ORM (Object Relational Mapper)  
 - ![AWS](https://img.shields.io/badge/AWS-232F3E?logo=amazonaws&logoColor=white) — Servicio en la nube  
 
