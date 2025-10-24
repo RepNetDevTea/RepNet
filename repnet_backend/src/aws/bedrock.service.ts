@@ -18,7 +18,7 @@ export class BedrockService {
   async scoreEvidence(prompt) {
 
     const payload = {
-        modelId: 'arn:aws:bedrock:us-east-2:055710070086:inference-profile/us.anthropic.claude-3-5-sonnet-20241022-v2:0', 
+        modelId: 'arn:aws:bedrock:us-east-2:509399593375:inference-profile/us.anthropic.claude-3-5-sonnet-20241022-v2:0', 
         contentType: 'application/json', 
         accept: 'application/json', 
         body: JSON.stringify({ 

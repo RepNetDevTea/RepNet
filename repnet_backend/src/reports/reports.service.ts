@@ -93,15 +93,34 @@ export class ReportsService {
     return report;
   }
 
-  async getAllReports() {
-    return await this.prisma.report.findMany({
-      include: {
-        votes: true,
-        evidences: true,
-        tags: true,
-        impacts: true
+  async getReports(page: number) {
+    const reportsPerRequest = 10;
+    const skip = (page - 1) * reportsPerRequest;
+
+    const [reports, totalNumberOfReports ] =  await Promise.all([
+      await this.prisma.report.findMany({
+        include: {
+          votes: true,
+          evidences: true,
+          tags: true,
+          impacts: true
+        }, 
+        skip, 
+        take: reportsPerRequest, 
+      }), 
+      await this.prisma.report.count(), 
+    ]);     
+
+    const totalNumberOfPages = Math.ceil(totalNumberOfReports / reportsPerRequest);
+
+    return {
+      reports, 
+      metaData: {
+        currentPage: page, 
+        totalNumberOfPages,
+        totalNumberOfReports, 
       }
-    });
+    };
   }
 
   async findReportById(reportId: number) {

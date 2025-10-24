@@ -1,6 +1,6 @@
 import { 
   Body, Controller, Delete, FileTypeValidator, Get, HttpException, Inject, MaxFileSizeValidator, NotFoundException, Param, 
-  ParseFilePipe, ParseIntPipe, Patch, Post, Req, UploadedFile, UseGuards, 
+  ParseFilePipe, ParseIntPipe, Patch, Post, Query, Req, UploadedFile, UseGuards, 
   UseInterceptors 
 } from '@nestjs/common';
 import { ReportsService } from './reports.service';
@@ -63,13 +63,31 @@ export class ReportsController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'llama todos los reportes' })
-  async getAllReports() {
-    const reports = await this.reportsService.getAllReports();
-    if (!reports)
-      throw new NotFoundException('There are no reports');
+  @ApiOperation({ summary: 'llama un report respecto a su id o por página' })
+  async getReports(
+    @Query('page') page?: string, 
+    @Query('reportId') reportId?: string, 
+  ) {
+    if (reportId) {
+      const report = await this.reportsService.findReportById(parseInt(reportId));
+      if (!report)
+        throw new NotFoundException('There report was not found');
 
-    return reports;
+      const { createdAt, ...reamingData } = report;
+      return {
+        ...reamingData,
+        createdAt: createdAt.toLocaleString('es-MX'), 
+      };
+    }
+
+    if (page !== undefined && typeof parseInt(page) !== 'number')
+      throw new HttpException('Missing page number', 400);
+
+    const data = await this.reportsService.getReports(parseInt(page as string));
+    if (!data.reports.length)
+      throw new HttpException('There are no reports', 400);
+
+    return data;
   }
 
 

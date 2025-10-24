@@ -4,13 +4,13 @@ import { CreateVoteAdminDto } from './dtos/create_vote_admin.dto';
 import { UpdateVoteAdminDto } from './dtos/update-vote-adimn.dto';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
-@ApiTags('Votes')
+@ApiTags('votes')
 @Controller('votes')
 export class VotesController {
   constructor(private readonly votesService: VotesService) {}
 
   @Get()
-  ApiTags('Votes')
+  @ApiOperation({ summary: 'llama todos los votos' })
   async getAllVotes() {
     const votes = await this.votesService.findVotes();
     if (!votes)

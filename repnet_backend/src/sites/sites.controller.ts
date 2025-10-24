@@ -20,7 +20,7 @@ export class SitesController {
   }
 
   @Get() 
-  @ApiOperation({ summary: 'llama un sitio web respecto a su dominio' })
+  @ApiOperation({ summary: 'llama un sitio web respecto a su dominio o por página' })
   async getSites(
     @Query('page') page?: string, 
     @Query('siteDomain') siteDomain?: string, 
