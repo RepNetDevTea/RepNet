@@ -1,4 +1,4 @@
-# 💻 Servidor RepNet
+# 💻 RepNet Server
 
 En este repositorio está almacenado el código del **servidor multiplataforma de RepNet**, y esta es una guía detallada de sus especificaciones y cómo inicializarlo.
 
