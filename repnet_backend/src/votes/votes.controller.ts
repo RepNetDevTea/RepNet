@@ -10,7 +10,7 @@ export class VotesController {
   constructor(private readonly votesService: VotesService) {}
 
   @Get()
-  @ApiOperation({ summary: 'llama todos los votos de la aplicacion' })
+  ApiTags('Votes')
   async getAllVotes() {
     const votes = await this.votesService.findVotes();
     if (!votes)

@@ -23,6 +23,7 @@ import { BedrockService } from 'src/aws/bedrock.service';
 import { UpdateReportStatustDto } from './dtos/update-report-status.dto';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
+@ApiTags('reports')
 @Controller('reports')
 export class ReportsController {
   constructor(
@@ -37,6 +38,7 @@ export class ReportsController {
   
   @Post()
   @UseGuards(AccessJwtAuthGuard)
+  @ApiOperation({ summary: 'crea un reporte un usuario' })
   async createReport(@Req() req: Request, @Body() body: CreateReportDto) {
     const { tags, impacts, ...reportData} = body;
     const userId = instanceToPlain(req.user).id;
@@ -61,6 +63,7 @@ export class ReportsController {
   }
 
   @Get()
+  @ApiOperation({ summary: 'llama todos los reportes' })
   async getAllReports() {
     const reports = await this.reportsService.getAllReports();
     if (!reports)
@@ -71,6 +74,7 @@ export class ReportsController {
 
 
   @Get(':reportId')
+  @ApiOperation({ summary: 'llama un reporte por su ID' })
   async getReport(@Param('reportId', new ParseIntPipe) reportId: number) {
     const report = await this.reportsService.findReportById(reportId);
     if (!report)
@@ -80,6 +84,7 @@ export class ReportsController {
   }
 
   @Patch(':reportId')
+  @ApiOperation({ summary: 'modifica un reporte por su id' })
   async updateReport(@Param('reportId', new ParseIntPipe) reportId: number, @Body() body: UpdateReportDto) {
     const { 
       addedTags, 
@@ -100,6 +105,7 @@ export class ReportsController {
   }
 
   @Delete(':reportId')
+  @ApiOperation({ summary: 'Borra un reporte por su ID' })
   async deleteReport(@Param('reportId', new ParseIntPipe) reportId: number) {
     const deletedReport = await this.reportsService.deleteReportById(reportId);
     if (!deletedReport)
@@ -109,6 +115,7 @@ export class ReportsController {
   }
 
   @Patch(':reportId/status')
+  @ApiOperation({ summary: 'modificar el status de un reporte' })
   async updateReportStatus(
     @Param('reportId', new ParseIntPipe) reportId: number, 
     @Body() body: UpdateReportStatustDto, 
@@ -124,6 +131,7 @@ export class ReportsController {
   }
 
   @Post(':reportId/toggleVote')
+  @ApiOperation({ summary: 'le asigna un voto a un reporte' })
   @UseGuards(AccessJwtAuthGuard)
   async toggleDownvote(
     @Req() req: Request, 
@@ -154,6 +162,7 @@ export class ReportsController {
   }
 
   @Patch(':reportId/severityScore')
+  @ApiOperation({ summary: 'le asigna una severidad a un reporte' })
   async computeSeverityScore(@Param('reportId', new ParseIntPipe) reportId: number) {
     const report = await this.reportsService.findReportById(reportId);
     if (!report)
@@ -227,6 +236,7 @@ export class ReportsController {
 
   @Post(':reportId/evidences')
   @UseInterceptors(FileInterceptor('file'))
+  @ApiOperation({ summary: 'le asigna evidencia a un reporte' })
   async createEvidence(
     @Param('reportId', new ParseIntPipe) reportId: number, 
     @UploadedFile(
@@ -262,6 +272,7 @@ export class ReportsController {
   }
 
   @Get(':reportId/evidences')
+  @ApiOperation({ summary: 'llama las evidencias de un reporte' })
   async getEvidencesByReportId(@Param('reportId', new ParseIntPipe) reportId: number) {
     const evidences = await this.reportsService.findEvidencesById(reportId);
     if (evidences === null)
@@ -273,6 +284,7 @@ export class ReportsController {
   }
 
   @Patch(':reportId/evidences/:evidenceId')
+  @ApiOperation({ summary: 'remplaza la evidencia de un reporte por otra evidencia' })
   @UseInterceptors(FileInterceptor('file'))
   async updateReportEvicenceByEvidenceId(
     @Param('reportId', new ParseIntPipe) reportId: number, 
@@ -304,6 +316,7 @@ export class ReportsController {
   }
 
   @Delete(':reportId/evidences/:evidenceId')
+  @ApiOperation({ summary: 'borra la evidencia de un reporte' })
   async deleteReportEvidenceByEvidenceId(
     @Param('reportId', new ParseIntPipe) reportId: number, 
     @Param('evidenceId', new ParseIntPipe) evidenceId: number, 

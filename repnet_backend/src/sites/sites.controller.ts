@@ -4,11 +4,13 @@ import { CreateSiteDto } from './dtos/create-site.dto';
 import { UpdateSiteDto } from './dtos/update-site.dto';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
+@ApiTags('Votes')
 @Controller('sites')
 export class SitesController {
   constructor(private readonly sitesService: SitesService) {}
 
   @Post()
+  @ApiOperation({ summary: 'El usuario manda un voto a un reporte' })
   async createSite(@Body() body: CreateSiteDto) {
     const createdSite = await this.sitesService.createSite(body);
     if (!createdSite)
@@ -18,6 +20,7 @@ export class SitesController {
   }
 
   @Get() 
+  @ApiOperation({ summary: 'llama un sitio web respecto a su dominio' })
   async getSites(
     @Query('page') page?: string, 
     @Query('siteDomain') siteDomain?: string, 
@@ -45,6 +48,7 @@ export class SitesController {
   }
 
   @Get(':siteId')
+  @ApiOperation({ summary: 'busca un sitio por su id' })
   async getSiteById(@Param('siteId', new ParseIntPipe) siteId: number) {
     const site = await this.sitesService.findSite({ id: siteId });
     if (!site)
@@ -59,6 +63,7 @@ export class SitesController {
   }
 
   @Patch(':siteId')
+  @ApiOperation({ summary: 'modificar un sitio por id' })
   async updateSite(
     @Param('siteId', new ParseIntPipe) siteId: number, 
     @Body() body: UpdateSiteDto
@@ -71,6 +76,7 @@ export class SitesController {
   }
 
   @Delete(':siteId')
+  @ApiOperation({ summary: 'borramos un sitio por id' })
   async deleteSite(@Param('siteId', new ParseIntPipe) siteId: number) {
     const deletedSite = await this.sitesService.deleteSiteById(siteId);
     if (deletedSite)
@@ -80,6 +86,7 @@ export class SitesController {
   }  
 
   @Get(':siteId/reputation')
+  @ApiOperation({ summary: 'llama la reputacion de un sitio' })
   async getSiteReputationById(@Param('siteId', new ParseIntPipe) siteId: number) {
     const site = await this.sitesService.findSite({ id: siteId });
     if (!site)
