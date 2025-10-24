@@ -19,21 +19,21 @@ export class S3Service {
   }
 
   createFileUrl(key: string) {
-    const bucketName = 'repnet-evidences-bucket-emi';
+    const bucketName = 'repnet-evidences-bucket';
     const region = this.s3Configuration.region;
     const evidenceFileUrl = `https://${bucketName}.s3.${region}.amazonaws.com/${encodeURIComponent(key)}`;
     return evidenceFileUrl;
   }
 
   createFileUri(key: string) {
-    const bucketName = 'repnet-evidences-bucket-emi';
+    const bucketName = 'repnet-evidences-bucket';
     return `s3://${bucketName}/${key}`;
   }
 
   async upload(fileKey: string, file: Buffer) {
     return await this.s3Client.send(
       new PutObjectCommand({
-        Bucket: 'repnet-evidences-bucket-emi', 
+        Bucket: 'repnet-evidences-bucket', 
         Key: fileKey,
         Body: file,
       })
@@ -43,7 +43,7 @@ export class S3Service {
   async retrieve(fileKey: string) {
     const response = await this.s3Client.send(
       new GetObjectCommand({
-        Bucket : 'repnet-evidences-bucket-emi',
+        Bucket : 'repnet-evidences-bucket',
         Key: fileKey, 
       })
     );
@@ -58,7 +58,7 @@ export class S3Service {
   async delete(fileKey: string) {
     await this.s3Client.send(
       new DeleteObjectCommand({
-        Bucket: 'repnet-evidences-bucket-emi',
+        Bucket: 'repnet-evidences-bucket',
         Key: fileKey, 
       })
     );
