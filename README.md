@@ -77,13 +77,7 @@ Después de haber repetido este proceso dos veces, hemos acabado de asignar los 
 ### Paso 0
 
 Con el propósito de montar el servidor, hay que clonar este repositorio (tener un repositorio local) como otro repo almacenado en GitHub.  
-Dentro de nuestro repositorio local, nos dirigiremos hacia el subdirectorio `repnet_backend/` ejecutando el siguiente comando:
-
-```bash
-cd ./repnet_backend
-```
-
-Una manera de comprobar que tienes un repositorio local exitoso (vinculado al repositorio remoto), es la existencia del subdirectorio `.git/`.
+Dentro de nuestro repositorio local, una manera de comprobar que tienes un repositorio local exitoso (vinculado al repositorio remoto), es la existencia del subdirectorio `.git/`.
 
 ```plaintext
 RepNet/
