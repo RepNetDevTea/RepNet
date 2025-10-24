@@ -56,7 +56,7 @@ export class UpdateUserAdminDto {
   hashedPassword: string;
 
   @ApiPropertyOptional({
-    example: 'editor',
+    example: 'admin',
     description: 'Nuevo rol asignado al usuario'
   })
   @IsOptional()

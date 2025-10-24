@@ -15,7 +15,7 @@ export class TagReferenceDto {
   id: number;
 
   @ApiPropertyOptional({
-    example: 'Sostenibilidad',
+    example: 'estafa',
     description: 'Nombre de la etiqueta referenciada'
   })
   @IsOptional()

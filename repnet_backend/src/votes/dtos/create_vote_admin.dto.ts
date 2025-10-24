@@ -11,7 +11,7 @@ export class CreateVoteAdminDto {
   voteType: string;
 
   @ApiProperty({
-    example: 42,
+    example: 4,
     description: 'ID del usuario administrador que emite el voto'
   })
   @IsNotEmpty()

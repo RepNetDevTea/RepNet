@@ -7,7 +7,7 @@ import {
 
 export class CreateTagDto {
   @ApiProperty({
-    example: 'Sostenibilidad',
+    example: 'Robo de identidad',
     description: 'Nombre de la etiqueta que será registrada'
   })
   @IsNotEmpty()
@@ -23,7 +23,7 @@ export class CreateTagDto {
   tagScore: number;
 
   @ApiProperty({
-    example: 'Etiqueta relacionada con prácticas sostenibles y ecológicas.',
+    example: 'El usuario perdio alguna credencial por el sitio web',
     description: 'Descripción breve de la etiqueta'
   })
   @IsNotEmpty()

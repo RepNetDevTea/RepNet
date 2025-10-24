@@ -7,7 +7,7 @@ import {
 
 export class UpdateTagDto {
   @ApiPropertyOptional({
-    example: 'Sostenibilidad avanzada',
+    example: 'monetario',
     description: 'Nuevo nombre de la etiqueta (opcional)'
   })
   @IsOptional()
@@ -23,7 +23,7 @@ export class UpdateTagDto {
   tagScore: number;
 
   @ApiPropertyOptional({
-    example: 'Etiqueta actualizada con enfoque en prácticas ecológicas avanzadas.',
+    example: 'el usuario perdio dinero',
     description: 'Nueva descripción de la etiqueta (opcional)'
   })
   @IsOptional()

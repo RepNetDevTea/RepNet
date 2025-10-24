@@ -52,6 +52,7 @@ export class UsersController {
 
   @Patch('me')
   @UseGuards(AccessJwtAuthGuard)
+  @ApiOperation({ summary: 'Actualiza la informacion del usuario' })
   async updateUser(@Req() req: Request, @Body() body: UpdateUserDto) {
     const { id } = instanceToPlain(req.user);
     const updatedUser = await this.userService.updateUserById(id, body);
@@ -63,6 +64,7 @@ export class UsersController {
 
   @Delete('me')
   @UseGuards(AccessJwtAuthGuard)
+  @ApiOperation({ summary: 'El usuario se borra a si mismo' })
   async deleteUser(@Req() req: Request) {
     const { id } = instanceToPlain(req.user);
     const deletedUser = await this.userService.deleteUserById(id);
@@ -73,6 +75,7 @@ export class UsersController {
   }
 
   @Get(':userId')
+  @ApiOperation({ summary: 'Se busca un usuario por ID' })
   async getUserById(@Param('userId', new ParseIntPipe) userId: number) {
     const user = await this.userService.findUserById(userId);
     if (!user)
@@ -82,6 +85,7 @@ export class UsersController {
   }
 
   @Patch(':userId')
+  @ApiOperation({ summary: 'Se modifica usuario por ID' })
   async updateUserById(@Param('userId', new ParseIntPipe) userId: number, @Body() body: UpdateUserAdminDto) {
     const updatedUser = await this.userService.updateUserById(userId, body);
     if(!updatedUser)

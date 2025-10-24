@@ -4,11 +4,13 @@ import { TagsService } from './tags.service';
 import { UpdateTagDto } from './dtos/update-tag.dto';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
+@ApiTags('tags')
 @Controller('tags')
 export class TagsController {
   constructor(private readonly tagsService: TagsService) {}
   
   @Post()
+  @ApiOperation({ summary: 'Crea un nuevo tag' })
   async createTag(@Body() body: CreateTagDto) {
     const user = await this.tagsService.createTag(body);
     if (!user)
@@ -18,6 +20,7 @@ export class TagsController {
   }
 
   @Get()
+  @ApiOperation({ summary: 'llama todos los tags de la aplicacion' })
   async getAllTags() {
     const tags = await this.tagsService.getAllTags();
     if (!tags)
@@ -27,6 +30,7 @@ export class TagsController {
   }
 
   @Get(':tagId')
+  @ApiOperation({ summary: 'llama un tag por su ID' })
   async getTagById(@Param('tagId', new ParseIntPipe) tagId: number) {
     const tag = await this.tagsService.findTagByFilter({ id: tagId });
     if (!tag)
@@ -36,6 +40,7 @@ export class TagsController {
   }
 
   @Patch(':tagId')
+  @ApiOperation({ summary: 'modifica un tag por su ID' })
   async updateTag(
     @Param('tagId', new ParseIntPipe) tagId: number, 
     @Body() body: UpdateTagDto
@@ -48,6 +53,7 @@ export class TagsController {
   }
 
   @Delete(':tagId')
+  @ApiOperation({ summary: 'borra un tag por su ID' })
   async deleteTag(@Param('tagId', new ParseIntPipe) tagId: number) {
     const deletedTag = await this.tagsService.deleteTagById(tagId);
     if (!deletedTag)

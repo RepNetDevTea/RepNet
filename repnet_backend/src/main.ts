@@ -45,9 +45,9 @@ async function bootstrap() {
 
   const allowedOrigins = [
     'http://localhost:3000', 'http://localhost:5173', 
-    'http://10.48.200.81:3000', 'http://10.48.200.81:5173', 
-    'http://10.48.208.241:3000', 'htpp://10.48.208.241:5173', 
-    'http://10.48.227.78:3000', 'http://10.48.227.78:5173', 
+    'http://10.48.200.81',  
+    'http://10.48.208.241', 
+    'http://10.48.227.78', 
   ];
 
   app.enableCors({
